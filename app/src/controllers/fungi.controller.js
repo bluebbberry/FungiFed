@@ -1,5 +1,5 @@
 import express from "express";
-import { parseAndExecuteFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
+import { parseAndSetCommandsFromFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
 
 const router = express.Router();
 
@@ -10,10 +10,10 @@ router.get("/", async (request, response) => {
     }});
 });
 
-// post fungi code to bot to execute
+// post fungi code to bot to execute on next reply
 router.post("/", async (request, response) => {
     const fungiCode = JSON.stringify(request.body);
-    const success = parseAndExecuteFungiCode(fungiCode);
+    const success = parseAndSetCommandsFromFungiCode(fungiCode);
     response.status(200).json({ responseBody: success });
 });
 

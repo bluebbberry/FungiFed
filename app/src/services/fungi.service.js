@@ -34,6 +34,7 @@ export function startAnsweringMentions() {
 }
 
 let fungiCode;
+let fungiCommands;
 let codeHealth = 0;
 
 async function runInitialSearch() {
@@ -53,7 +54,7 @@ async function runFungiLifecycle() {
     }
 
     // 2. new code execution
-    parseAndExecuteFungiCode(fungiCode);
+    parseAndSetCommandsFromFungiCode(fungiCode);
 
     // 3. calculate code health
     // TODO
@@ -72,14 +73,13 @@ ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
 
 const fungiParser = new FungiParser();
 
-export function parseAndExecuteFungiCode(code) {
+export function parseAndSetCommandsFromFungiCode(code) {
     const SUCCESS = true;
     const FAIL = false;
     console.log("Received fungi code: " + code);
     const tokens = fungiParser.tokenize(code);
-    const commands = fungiParser.parse(tokens);
-    fungiParser.execute(commands);
-    console.log("Sucessfully parsed");
+    fungiCommands = fungiParser.parse(tokens);
+    console.log("Sucessfully parsed and set as commands");
     return SUCCESS;
 }
 
@@ -114,8 +114,8 @@ async function checkForMentionsAndLetFungiAnswer() {
 }
 
 async function generateAnswerToStatus(status) {
-    // TODO
     console.log("generateAnswerToStatus", status);
+    return fungiParser.execute(fungiCommands, status.content);
 }
 
 /**
