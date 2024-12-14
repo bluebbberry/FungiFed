@@ -34,3 +34,14 @@ export async function getStatusesFromFungiTag() {
 export function postStatusUnderFungiTag(message) {
     send(message + "#fungi")
 }
+
+export async function getStatusWithValidFUNGICodeFromFungiTag() {
+    const statuses = await getStatusesFromFungiTag();
+    for (let i = 0; i < statuses.length; i++) {
+        const status = statuses[i];
+        if (fungiParser.containsValidFUNGI(status.content)) {
+            console.log("found status with FUNGI code");
+            return status;
+        }
+    }
+}
