@@ -45,21 +45,24 @@ export class FungiParser {
     /**
      * Execute the parsed commands.
      * @param {Array} commands - Parsed FUNGI commands.
+     * @param {string} input - The input that should be processed.
      */
-    execute(commands) {
-        commands.forEach(command => this.executeCommand(command));
+    execute(commands, input) {
+        let temp = input;
+        commands.forEach(command => {
+            temp = this.executeCommand(command, temp);
+        });
+        return temp;
     }
 
     /**
      * Execute a single command.
      * @param {Object} command - Single command object.
+     * @param {string} input - the message that should be replied to.
      */
-    executeCommand(command) {
-        if (command.command === "ONREPLY") {
-            console.log(`Received reply: ${command.replyMessage}`);
-            console.log(`Responding: ${command.respondMessage}`);
-        } else {
-            console.warn(`Unknown command: ${command.command}`);
+    executeCommand(command, input) {
+        if (command.command === "ONREPLY" && input == command.replyMessage) {
+            return command.respondMessage;
         }
     }
 

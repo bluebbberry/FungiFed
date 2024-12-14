@@ -1,7 +1,8 @@
 import { FungiParser } from "./fungi-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
-import { send } from "./post.util.service.js";
+import {send, sendReply} from "./post.util.service.js";
+import { getMentionsNotifications } from "./notifications.service.js";
 
 /**
  * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -24,7 +25,16 @@ export function startFungiLifecycle() {
     });
 }
 
+export function startAnsweringMentions() {
+    const answerSchedule = '0 * * * *';
+    cron.schedule(answerSchedule, () => {
+        checkForMentionsAndLetFungiAnswer();
+    });
+    console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
+}
+
 let fungiCode;
+let fungiCommands;
 let codeHealth = 0;
 
 async function runInitialSearch() {
@@ -44,7 +54,7 @@ async function runFungiLifecycle() {
     }
 
     // 2. new code execution
-    parseAndExecuteFungiCode(fungiCode);
+    parseAndSetCommandsFromFungiCode(fungiCode);
 
     // 3. calculate code health
     // TODO
@@ -63,14 +73,13 @@ ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
 
 const fungiParser = new FungiParser();
 
-export function parseAndExecuteFungiCode(code) {
+export function parseAndSetCommandsFromFungiCode(code) {
     const SUCCESS = true;
     const FAIL = false;
     console.log("Received fungi code: " + code);
     const tokens = fungiParser.tokenize(code);
-    const commands = fungiParser.parse(tokens);
-    fungiParser.execute(commands);
-    console.log("Sucessfully parsed");
+    fungiCommands = fungiParser.parse(tokens);
+    console.log("Sucessfully parsed and set as commands");
     return SUCCESS;
 }
 
@@ -94,6 +103,19 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
             return status;
         }
     }
+}
+
+async function checkForMentionsAndLetFungiAnswer() {
+    const mentions = await getMentionsNotifications();
+    mentions.forEach(mention => {
+        const answer = generateAnswerToStatus(mention.status);
+        sendReply(mention.status, answer);
+    });
+}
+
+async function generateAnswerToStatus(status) {
+    console.log("generateAnswerToStatus", status);
+    return fungiParser.execute(fungiCommands, status.content);
 }
 
 /**
