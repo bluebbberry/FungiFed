@@ -9,11 +9,7 @@ ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
 
 const fungiParser = new FungiParser();
 
-export function test() {
-    return "test";
-}
-
-export function parseFungiCode(c) {
+export function parseAndExecuteFungiCode(c) {
     const SUCCESS = true;
     const FAIL = false;
     console.log("Received fungi code: " + code);
