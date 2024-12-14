@@ -1,7 +1,8 @@
 import { FungiParser } from "./fungi-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
-import { send } from "./post.util.service.js";
+import {send, sendReply} from "./post.util.service.js";
+import { getMentionsNotifications } from "./notifications.service.js";
 
 /**
  * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -22,6 +23,14 @@ export function startFungiLifecycle() {
             console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
         });
     });
+}
+
+export function startAnsweringMentions() {
+    const answerSchedule = '0 * * * *';
+    cron.schedule(answerSchedule, () => {
+        checkForMentionsAndLetFungiAnswer();
+    });
+    console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
 }
 
 let fungiCode;
@@ -94,6 +103,19 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
             return status;
         }
     }
+}
+
+async function checkForMentionsAndLetFungiAnswer() {
+    const mentions = await getMentionsNotifications();
+    mentions.forEach(mention => {
+        const answer = generateAnswerToStatus(mention.status);
+        sendReply(mention.status, answer);
+    });
+}
+
+async function generateAnswerToStatus(status) {
+    // TODO
+    console.log("generateAnswerToStatus", status);
 }
 
 /**

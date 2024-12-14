@@ -2,7 +2,7 @@ import express from 'express';
 import cors from "cors";
 import userController from "./src/controllers/user.controller.js";
 import fungiController from "./src/controllers/fungi.controller.js";
-import { startFungiLifecycle } from "./src/services/fungi.service.js";
+import {startAnsweringMentions, startFungiLifecycle} from "./src/services/fungi.service.js";
 import notificationsController from "./src/controllers/notifications.controller.js";
 
 // ============== REST API ===================
@@ -25,3 +25,4 @@ app.listen(PORT, () => {
 });
 
 startFungiLifecycle();
+startAnsweringMentions();
