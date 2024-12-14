@@ -1,4 +1,6 @@
 import { FungiParser } from "./fungi-parser.service.js";
+import { send } from "./post.util.service.js";
+import masto from "../configs/mastodonclient.js";
 
 // Example usage:
 const code = `
@@ -20,4 +22,15 @@ export function parseFungiCode(c) {
     fungiParser.execute(commands);
     console.log("Sucessfully parsed");
     return SUCCESS;
+}
+
+export async function getStatusesFromFungiTag() {
+    const statuses = await masto.v1.timelines.tag.$select("fungi").list({
+        limit: 30,
+    });
+    return statuses;
+}
+
+export function postStatusUnderFungiTag(message) {
+    send(message + "#fungi")
 }
