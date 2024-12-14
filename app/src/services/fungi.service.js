@@ -22,26 +22,30 @@ runInitialSearch().then(() => {
     });
 });
 
+let fungiCode;
+let codeHealth = 0;
+
 async function runInitialSearch() {
     // 1. initial search
-    // TODO
     console.log("runInitialSearch");
+    const status = await getStatusWithValidFUNGICodeFromFungiTag();
+    fungiCode = status.content;
 }
 
 async function runFungiLifecycle() {
     console.log("runFungiLifecycle");
 
     // 2. new code execution
-    // TODO
+    parseAndExecuteFungiCode(fungiCode);
 
     // 3. calculate code health
     // TODO
 
     // 4. scrape and share code health
-    // TODO
+    postStatusUnderFungiTag(fungiCode + " CodeHealth: " + codeHealth);
 
     // 5. calculate mutation
-    // TODO
+    fungiCode = getStatusWithValidFUNGICodeFromFungiTag(fungiCode);
 }
 
 // Example usage:
