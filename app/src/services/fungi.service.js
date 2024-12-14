@@ -32,7 +32,7 @@ export async function getStatusesFromFungiTag() {
 }
 
 export function postStatusUnderFungiTag(message) {
-    send(message + "#fungi")
+    send(message + "#fungi");
 }
 
 export async function getStatusWithValidFUNGICodeFromFungiTag() {
