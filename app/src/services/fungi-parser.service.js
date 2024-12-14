@@ -62,4 +62,14 @@ export class FungiParser {
             console.warn(`Unknown command: ${command.command}`);
         }
     }
+
+    containsValidFUNGI(content) {
+        try {
+            const tokens = this.tokenize(content);
+            this.parse(tokens);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 }

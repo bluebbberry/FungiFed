@@ -1,17 +1,19 @@
 import express from "express";
-import { test, parseFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
+import { parseAndExecuteFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
 
 const router = express.Router();
 
+// test if bot alive
 router.get("/", async (request, response) => {
     response.status(200).json({ responseBody: {
-        "test": test()
+        "alive": true
     }});
 });
 
+// post fungi code to bot to execute
 router.post("/", async (request, response) => {
     const fungiCode = JSON.stringify(request.body);
-    const success = parseFungiCode(fungiCode);
+    const success = parseAndExecuteFungiCode(fungiCode);
     response.status(200).json({ responseBody: success });
 });
 
@@ -27,6 +29,7 @@ router.get("/tag", async (request, response) => {
     }
 });
 
+// post statuses to hashtag
 router.post("/tag", async (request, response) => {
     const body = request.body;
     await postStatusUnderFungiTag(body["message"]);
