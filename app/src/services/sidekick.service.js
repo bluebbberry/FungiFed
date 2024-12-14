@@ -1,7 +1,5 @@
 import { addToCollective } from "./buzz.service.js";
 import { send } from "./post.util.service.js";
-import { addToKnowledgeBase } from "./dolphin.service.js";
-import * as Config from "../configs/config.js";
 
 export async function sendMsgToServerOverSidekick(message, sidekick) {
     if (sidekick === 'spark') {
@@ -33,9 +31,6 @@ export async function sendMsgToServerOverSidekick(message, sidekick) {
         } else {
             await send(message);
         }
-    } else if (sidekick === 'dolphin') {
-        await send(message);
-        addToKnowledgeBase(Config.ACCOUNT_NAME, message);
     } else if (sidekick === 'buzz') {
         addToCollective(message);
     } else {
