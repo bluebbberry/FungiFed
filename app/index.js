@@ -2,6 +2,7 @@ import express from 'express';
 import cors from "cors";
 import userController from "./src/controllers/user.controller.js";
 import fungiController from "./src/controllers/fungi.controller.js";
+import { startFungiLifecycle } from "./src/services/fungi.service.js";
 
 // ============== REST API ===================
 const app = express();
@@ -20,3 +21,5 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
 });
+
+startFungiLifecycle();

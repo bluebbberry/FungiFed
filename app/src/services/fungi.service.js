@@ -12,15 +12,17 @@ import { send } from "./post.util.service.js";
  * 4. SCRAPE & SHARE CODE HEALTH: The result with the related code is posted under the nutrition hashtag for other bots to process; at the same time, new code, potentially with evaulation results is scraped from the hashtag (of course, this may also come from human users).
  * 5. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 3, this time with the picked code
  */
-runInitialSearch().then(() => {
-    runFungiLifecycle().then(() => {
-        const cronSchedule = '0 * * * *';
-        cron.schedule(cronSchedule, () => {
-            runFungiLifecycle();
+export function startFungiLifecycle() {
+    runInitialSearch().then(() => {
+        runFungiLifecycle().then(() => {
+            const cronSchedule = '0 * * * *';
+            cron.schedule(cronSchedule, () => {
+                runFungiLifecycle();
+            });
+            console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
         });
-        console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
     });
-});
+}
 
 let fungiCode;
 let codeHealth = 0;
@@ -29,11 +31,17 @@ async function runInitialSearch() {
     // 1. initial search
     console.log("runInitialSearch");
     const status = await getStatusWithValidFUNGICodeFromFungiTag();
-    fungiCode = status.content;
+    if (status) fungiCode = status.content;
 }
 
 async function runFungiLifecycle() {
     console.log("runFungiLifecycle");
+
+    if (!fungiCode) {
+        console.warn("No initial code found");
+        await runInitialSearch();
+        return;
+    }
 
     // 2. new code execution
     parseAndExecuteFungiCode(fungiCode);
@@ -55,11 +63,11 @@ ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
 
 const fungiParser = new FungiParser();
 
-export function parseAndExecuteFungiCode(c) {
+export function parseAndExecuteFungiCode(code) {
     const SUCCESS = true;
     const FAIL = false;
-    console.log("Received fungi code: " + exampleCode);
-    const tokens = fungiParser.tokenize(exampleCode);
+    console.log("Received fungi code: " + code);
+    const tokens = fungiParser.tokenize(code);
     const commands = fungiParser.parse(tokens);
     fungiParser.execute(commands);
     console.log("Sucessfully parsed");
