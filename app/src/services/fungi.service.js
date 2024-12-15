@@ -1,8 +1,9 @@
-import { FungiParser } from "./fungi-parser.service.js";
+import {FungiParser} from "./fungi-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
-import { send, sendReply } from "./post.util.service.js";
-import { getMentionsNotifications } from "./notifications.service.js";
+import {send, sendReply} from "./post.util.service.js";
+import {getMentionsNotifications} from "./notifications.service.js";
+import {decode} from 'html-entities';
 
 /**
  * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -46,7 +47,9 @@ async function runInitialSearch() {
     // 1. initial search
     console.log("runInitialSearch");
     const status = await getStatusWithValidFUNGICodeFromFungiTag();
-    if (status) fungiCode = status.content;
+    if (status) {
+        fungiCode = decode(status.content);
+    }
     else {
         fungiCode = exampleCode;
     }
@@ -95,7 +98,8 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
     const statuses = await getStatusesFromFungiTag();
     for (let i = 0; i < statuses.length; i++) {
         const status = statuses[i];
-        if (fungiParser.containsValidFUNGI(status.content)) {
+        const decodedStatusContent = decode(status.content);
+        if (fungiParser.containsValidFUNGI(decodedStatusContent)) {
             console.log("found status with FUNGI code");
             return status;
         }

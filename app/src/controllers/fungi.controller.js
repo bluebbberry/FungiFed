@@ -5,7 +5,7 @@ import {
     postStatusUnderFungiTag,
     generateAnswerToText
 } from "../services/fungi.service.js";
-import {decode, encode} from 'html-entities';
+import { decode } from 'html-entities';
 
 const router = express.Router();
 
