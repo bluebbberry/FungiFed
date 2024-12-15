@@ -61,7 +61,7 @@ export class FungiParser {
      * @param {string} input - the message that should be replied to.
      */
     executeCommand(command, input) {
-        if (command.command === "ONREPLY" && input == command.replyMessage) {
+        if (command.command === "ONREPLY" && input && input.includes(command.replyMessage)) {
             return command.respondMessage;
         }
     }
