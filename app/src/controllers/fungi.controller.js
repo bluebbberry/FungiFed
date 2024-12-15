@@ -1,5 +1,11 @@
 import express from "express";
-import { parseAndSetCommandsFromFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
+import {
+    parseAndSetCommandsFromFungiCode,
+    getStatusesFromFungiTag,
+    postStatusUnderFungiTag,
+    generateAnswerToText
+} from "../services/fungi.service.js";
+import { decode } from 'html-entities';
 
 const router = express.Router();
 
@@ -12,9 +18,18 @@ router.get("/", async (request, response) => {
 
 // post fungi code to bot to execute on next reply
 router.post("/", async (request, response) => {
-    const fungiCode = JSON.stringify(request.body);
-    const success = parseAndSetCommandsFromFungiCode(fungiCode);
+    const fungiCode = request.body;
+    const decodedFungiCode = decode(fungiCode["content"]);
+    const success = parseAndSetCommandsFromFungiCode(decodedFungiCode);
     response.status(200).json({ responseBody: success });
+});
+
+// ask bot for a reply
+router.post("/askforreply", async (request, response) => {
+    const text = request.body;
+    const textWithoutHtmlEncoded = decode(text["text"]);
+    const botResponse = await generateAnswerToText(textWithoutHtmlEncoded);
+    response.status(200).json({ responseBody: botResponse });
 });
 
 // get statuses from client

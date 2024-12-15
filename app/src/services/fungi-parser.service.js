@@ -6,6 +6,8 @@
 export class FungiParser {
     constructor() {
         this.variables = {}; // Store variables for execution
+        this.programEnd = "FUNGIEND";
+        this.programStart = "FUNGISTART";
     }
 
     /**
@@ -14,7 +16,18 @@ export class FungiParser {
      * @returns {Array} Array of tokens.
      */
     tokenize(code) {
-        return code.split(';').map(command => command.trim()).filter(command => command !== "");
+        // cut out valid code section (between start and end of program)
+        let startIndex = code.indexOf(this.programStart);
+        let endIndex = code.indexOf(this.programEnd);
+
+        if (startIndex === -1 || endIndex === -1) {
+            console.error("Found no program start or end");
+            return [];
+        }
+
+        const validCode = code.substring(startIndex + this.programStart.length, endIndex);
+
+        return validCode.split(';').map(command => command.trim()).filter(command => command !== "");
     }
 
     /**
@@ -69,6 +82,10 @@ export class FungiParser {
     }
 
     containsValidFUNGI(content) {
+        if (!content.includes(this.programStart) && !content.includes(this.programEnd)) {
+            return false;
+        }
+
         try {
             const tokens = this.tokenize(content);
             this.parse(tokens);
