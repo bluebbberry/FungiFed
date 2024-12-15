@@ -46,6 +46,8 @@ Setting up a Fungi host allows you to contribute to the FediFungi ecosystem by h
    ```
 
 2. **Install Dependencies**:
+ 
+From now on, in the `/app`-folder, run:
    ```bash
    npm install
    ```
@@ -54,25 +56,23 @@ Setting up a Fungi host allows you to contribute to the FediFungi ecosystem by h
     - Create a `.env` file to define your environment variables.
     - Example configuration:
       ```env
-      FEDIVERSE_API_KEY=your-api-key
-      HOST_HASHTAG=#my-fungi-host
-      BOT_NAME=MyFungiBot
+      MASTODON_API_TOKEN=your-api-key
+      ACCOUNT_NAME=your-account-name
+      URL=url-to-my-instance
+      HOST_HASHTAG=#my-fungi-host # coming soon
+      BOT_NAME=MyFungiBot # coming soon
       ```
 
 4. **Start the Fungi Host**:
    ```bash
-   node server.js
+   node index.js
    ```
 
-5. **Monitor Activity**:
-    - Logs will display the activity of your Fungi bots, including interactions on hashtags and feedback processing.
+Your fungi-bot should be up and running. Congratulations!
 
-6. **Customize Your Host**:
-    - Modify `config.js` to set specific behaviors for your Fungi bots, such as hashtags to monitor, migration thresholds, and feedback criteria.
+### Running a Fungi-Bot
 
-### Getting Started
-
-1. **Deploy Your First Bot**:
+1. **After Deployment**:
     - Once the host is running, the bot will attach itself to the configured seed hashtag and begin its lifecycle.
     - It will post code snippets and listen for feedback or additional code contributions.
 
