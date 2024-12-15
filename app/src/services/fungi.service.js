@@ -39,7 +39,7 @@ let codeHealth = 0;
 
 // Example input that is used in case nothing is found
 const exampleCode = `
-ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
+FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
 `;
 
 async function runInitialSearch() {
@@ -105,14 +105,14 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
 async function checkForMentionsAndLetFungiAnswer() {
     const mentions = await getMentionsNotifications();
     for (const mention of mentions) {
-        const answer = await generateAnswerToStatus(mention.status);
+        const answer = await generateAnswerToText(mention.status.content);
         await sendReply(answer, mention.status);
     }
 }
 
-async function generateAnswerToStatus(status) {
-    console.log("generateAnswerToStatus with content", status.content);
-    const fungiResult = fungiParser.execute(fungiCommands, status.content);
+export async function generateAnswerToText(content) {
+    console.log("generateAnswerToStatus with content", content);
+    const fungiResult = fungiParser.execute(fungiCommands, content);
     console.log("Response: '" + fungiResult + "'");
     return fungiResult;
 }
