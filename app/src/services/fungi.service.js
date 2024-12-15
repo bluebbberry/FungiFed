@@ -106,7 +106,7 @@ async function checkForMentionsAndLetFungiAnswer() {
     const mentions = await getMentionsNotifications();
     for (const mention of mentions) {
         const answer = await generateAnswerToStatus(mention.status);
-        await sendReply(mention.status, answer);
+        await sendReply(answer, mention.status);
     }
 }
 
