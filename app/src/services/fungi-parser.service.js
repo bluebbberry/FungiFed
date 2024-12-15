@@ -63,6 +63,8 @@ export class FungiParser {
     executeCommand(command, input) {
         if (command.command === "ONREPLY" && input && input.includes(command.replyMessage)) {
             return command.respondMessage;
+        } else {
+            return "Invalid input. Mention should contain: '" + command.replyMessage + "'";
         }
     }
 

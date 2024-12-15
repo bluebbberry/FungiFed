@@ -104,15 +104,17 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
 
 async function checkForMentionsAndLetFungiAnswer() {
     const mentions = await getMentionsNotifications();
-    mentions.forEach(mention => {
-        const answer = generateAnswerToStatus(mention.status);
-        sendReply(mention.status, answer);
-    });
+    for (const mention of mentions) {
+        const answer = await generateAnswerToStatus(mention.status);
+        await sendReply(mention.status, answer);
+    }
 }
 
 async function generateAnswerToStatus(status) {
-    console.log("generateAnswerToStatus", status);
-    return fungiParser.execute(fungiCommands, status.content);
+    console.log("generateAnswerToStatus with content", status.content);
+    const fungiResult = fungiParser.execute(fungiCommands, status.content);
+    console.log("Response: '" + fungiResult + "'");
+    return fungiResult;
 }
 
 /**
