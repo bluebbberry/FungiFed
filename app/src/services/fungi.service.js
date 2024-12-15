@@ -26,7 +26,7 @@ export function startFungiLifecycle() {
 }
 
 export function startAnsweringMentions() {
-    const answerSchedule = '0 * * * *';
+    const answerSchedule = '30 * * * *';
     cron.schedule(answerSchedule, () => {
         checkForMentionsAndLetFungiAnswer();
     });
