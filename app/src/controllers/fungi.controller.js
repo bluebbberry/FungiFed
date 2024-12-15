@@ -5,6 +5,7 @@ import {
     postStatusUnderFungiTag,
     generateAnswerToText
 } from "../services/fungi.service.js";
+import {decode, encode} from 'html-entities';
 
 const router = express.Router();
 
@@ -18,14 +19,16 @@ router.get("/", async (request, response) => {
 // post fungi code to bot to execute on next reply
 router.post("/", async (request, response) => {
     const fungiCode = request.body;
-    const success = parseAndSetCommandsFromFungiCode(fungiCode["content"]);
+    const decodedFungiCode = decode(fungiCode["content"]);
+    const success = parseAndSetCommandsFromFungiCode(decodedFungiCode);
     response.status(200).json({ responseBody: success });
 });
 
 // ask bot for a reply
 router.post("/askforreply", async (request, response) => {
     const text = request.body;
-    const botResponse = await generateAnswerToText(text["text"]);
+    const textWithoutHtmlEncoded = decode(text["text"]);
+    const botResponse = await generateAnswerToText(textWithoutHtmlEncoded);
     response.status(200).json({ responseBody: botResponse });
 });
 
