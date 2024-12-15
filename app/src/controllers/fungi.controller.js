@@ -17,8 +17,8 @@ router.get("/", async (request, response) => {
 
 // post fungi code to bot to execute on next reply
 router.post("/", async (request, response) => {
-    const fungiCode = JSON.stringify(request.body);
-    const success = parseAndSetCommandsFromFungiCode(fungiCode);
+    const fungiCode = request.body;
+    const success = parseAndSetCommandsFromFungiCode(fungiCode["content"]);
     response.status(200).json({ responseBody: success });
 });
 

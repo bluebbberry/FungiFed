@@ -19,6 +19,12 @@ export class FungiParser {
         // cut out valid code section (between start and end of program)
         let startIndex = code.indexOf(this.programStart);
         let endIndex = code.indexOf(this.programEnd);
+
+        if (startIndex === -1 || endIndex === -1) {
+            console.error("Found no program start or end");
+            return [];
+        }
+
         const validCode = code.substring(startIndex + this.programStart.length, endIndex);
 
         return validCode.split(';').map(command => command.trim()).filter(command => command !== "");
