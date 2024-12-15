@@ -1,7 +1,7 @@
 import { FungiParser } from "./fungi-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
-import {send, sendReply} from "./post.util.service.js";
+import { send, sendReply } from "./post.util.service.js";
 import { getMentionsNotifications } from "./notifications.service.js";
 
 /**
@@ -16,7 +16,7 @@ import { getMentionsNotifications } from "./notifications.service.js";
 export function startFungiLifecycle() {
     runInitialSearch().then(() => {
         runFungiLifecycle().then(() => {
-            const cronSchedule = '0 * * * *';
+            const cronSchedule = '2 * * * *';
             cron.schedule(cronSchedule, () => {
                 runFungiLifecycle();
             });
@@ -26,7 +26,7 @@ export function startFungiLifecycle() {
 }
 
 export function startAnsweringMentions() {
-    const answerSchedule = '0 * * * *';
+    const answerSchedule = '*/5 * * * *';
     cron.schedule(answerSchedule, () => {
         checkForMentionsAndLetFungiAnswer();
     });
@@ -37,21 +37,23 @@ let fungiCode;
 let fungiCommands;
 let codeHealth = 0;
 
+// Example input that is used in case nothing is found
+const exampleCode = `
+ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
+`;
+
 async function runInitialSearch() {
     // 1. initial search
     console.log("runInitialSearch");
     const status = await getStatusWithValidFUNGICodeFromFungiTag();
     if (status) fungiCode = status.content;
+    else {
+        fungiCode = exampleCode;
+    }
 }
 
 async function runFungiLifecycle() {
     console.log("runFungiLifecycle");
-
-    if (!fungiCode) {
-        console.warn("No initial code found");
-        await runInitialSearch();
-        return;
-    }
 
     // 2. new code execution
     parseAndSetCommandsFromFungiCode(fungiCode);
@@ -65,11 +67,6 @@ async function runFungiLifecycle() {
     // 5. calculate mutation
     fungiCode = getStatusWithValidFUNGICodeFromFungiTag(fungiCode);
 }
-
-// Example usage:
-const exampleCode = `
-ONREPLY "Hello" DORESPOND "Hello, Fediverse user!";
-`;
 
 const fungiParser = new FungiParser();
 
@@ -107,15 +104,17 @@ export async function getStatusWithValidFUNGICodeFromFungiTag() {
 
 async function checkForMentionsAndLetFungiAnswer() {
     const mentions = await getMentionsNotifications();
-    mentions.forEach(mention => {
-        const answer = generateAnswerToStatus(mention.status);
-        sendReply(mention.status, answer);
-    });
+    for (const mention of mentions) {
+        const answer = await generateAnswerToStatus(mention.status);
+        await sendReply(answer, mention.status);
+    }
 }
 
 async function generateAnswerToStatus(status) {
-    console.log("generateAnswerToStatus", status);
-    return fungiParser.execute(fungiCommands, status.content);
+    console.log("generateAnswerToStatus with content", status.content);
+    const fungiResult = fungiParser.execute(fungiCommands, status.content);
+    console.log("Response: '" + fungiResult + "'");
+    return fungiResult;
 }
 
 /**
