@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { FungiParser } from "../../src/services/fungi-parser.service.js";
 
-const fungiParser = new FungiParser();
+const fungiParser = FungiParser.parser();
 const testCode1 = `
 FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
 `;
