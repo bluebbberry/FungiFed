@@ -45,7 +45,7 @@ export class FungiParser {
             // Handle the ONREPLY command
             if (command === "ONREPLY") {
                 const replyMessage = parts[1].replace(/"/g, ''); // Remove quotes from the message
-                const respondMessage = parts.slice(3).join(" "); // Remove quotes from the message after DO RESPOND
+                const respondMessage = parts.slice(3).join(" ").replace(/"/g, ''); // Remove quotes from the message after DO RESPOND
                 commands.push({ command, replyMessage, respondMessage });
             } else {
                 throw new Error(`Unknown command '${command}'`);
