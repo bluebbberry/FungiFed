@@ -89,7 +89,7 @@ export class FungiService {
     }
 
     async getStatusesFromFungiTag() {
-        const statuses = await masto.v1.timelines.tag.$select("fungi").list({
+        const statuses = await masto.v1.timelines.tag.$select(Config.MYCELIAL_HASHTAG).list({
             limit: 30,
         });
         return statuses;
