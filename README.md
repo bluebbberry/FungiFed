@@ -56,11 +56,10 @@ From now on, in the `/app`-folder, run:
     - Create a `.env` file to define your environment variables.
     - Example configuration:
       ```env
-      MASTODON_API_TOKEN=your-api-key
+      MASTODON_API_KEY=your-api-key
       ACCOUNT_NAME=your-account-name
       URL=url-to-my-instance
-      HOST_HASHTAG=#my-fungi-host # coming soon
-      BOT_NAME=MyFungiBot # coming soon
+      MYCELIAL_HASHTAG=hashtag that fungi communicate over
       ```
 
 4. **Start the Fungi Host**:

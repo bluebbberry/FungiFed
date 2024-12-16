@@ -5,6 +5,7 @@ import { send, sendReply } from "./post.util.service.js";
 import { getMentionsNotifications } from "./notifications.service.js";
 import { decode } from 'html-entities';
 import { FungiState } from "../model/FungiState.js";
+import * as Config from "../configs/config.js";
 
 /**
  * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -95,7 +96,7 @@ export class FungiService {
     }
 
     postStatusUnderFungiTag(message) {
-        send(message + "#fungi");
+        send(message + "#" + Config.MYCELIAL_HASHTAG);
     }
 
     async getStatusWithValidFUNGICodeFromFungiTag() {
