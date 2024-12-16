@@ -10,6 +10,10 @@ export class FungiParser {
         this.programStart = "FUNGISTART";
     }
 
+    static parser() {
+        return new FungiParser();
+    }
+
     /**
      * Tokenize the input code into individual commands.
      * @param {string} code - The FUNGI code as a single-line string.

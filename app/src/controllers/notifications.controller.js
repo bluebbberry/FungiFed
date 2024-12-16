@@ -1,5 +1,4 @@
 import express from "express";
-import { parseAndSetCommandsFromFungiCode, getStatusesFromFungiTag, postStatusUnderFungiTag } from "../services/fungi.service.js";
 import {getMentionsNotifications} from "../services/notifications.service.js";
 
 const router = express.Router();

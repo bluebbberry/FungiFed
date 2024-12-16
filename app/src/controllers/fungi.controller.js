@@ -1,13 +1,9 @@
 import express from "express";
-import {
-    parseAndSetCommandsFromFungiCode,
-    getStatusesFromFungiTag,
-    postStatusUnderFungiTag,
-    generateAnswerToText
-} from "../services/fungi.service.js";
+import { FungiService } from "../services/fungi.service.js";
 import { decode } from 'html-entities';
 
 const router = express.Router();
+const fungiService = FungiService.fungiService();
 
 // test if bot alive
 router.get("/", async (request, response) => {
@@ -20,7 +16,7 @@ router.get("/", async (request, response) => {
 router.post("/", async (request, response) => {
     const fungiCode = request.body;
     const decodedFungiCode = decode(fungiCode["content"]);
-    const success = parseAndSetCommandsFromFungiCode(decodedFungiCode);
+    const success = fungiService.parseAndSetCommandsFromFungiCode(decodedFungiCode);
     response.status(200).json({ responseBody: success });
 });
 
@@ -28,7 +24,7 @@ router.post("/", async (request, response) => {
 router.post("/askforreply", async (request, response) => {
     const text = request.body;
     const textWithoutHtmlEncoded = decode(text["text"]);
-    const botResponse = await generateAnswerToText(textWithoutHtmlEncoded);
+    const botResponse = await fungiService.generateAnswerToText(textWithoutHtmlEncoded);
     response.status(200).json({ responseBody: botResponse });
 });
 
@@ -36,7 +32,7 @@ router.post("/askforreply", async (request, response) => {
 router.get("/tag", async (request, response) => {
     try {
         // Send message to mastodon server
-        const statuses = await getStatusesFromFungiTag();
+        const statuses = await fungiService.getStatusesFromFungiTag();
         response.status(200).json({ requestBody: statuses });
     } catch (error) {
         console.error("Error fetching posts:", error);
@@ -47,7 +43,7 @@ router.get("/tag", async (request, response) => {
 // post statuses to hashtag
 router.post("/tag", async (request, response) => {
     const body = request.body;
-    await postStatusUnderFungiTag(body["message"]);
+    await fungiService.postStatusUnderFungiTag(body["message"]);
     const success = true;
     response.status(200).json({ responseBody: success });
 });
