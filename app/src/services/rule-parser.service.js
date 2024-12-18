@@ -94,9 +94,9 @@ export class RuleParser {
      * @param {string} input - The input that should be processed.
      */
     execute(staticRuleSystem, input) {
-        let response = input;
+        let response = 'Sorry, no match';
         staticRuleSystem.getRules().forEach(staticRule => {
-            if (staticRule.trigger === input) {
+            if (staticRule.trigger.toLowerCase().includes(input.toLowerCase())) {
                 response = staticRule.response;
             }
         });
