@@ -42,8 +42,7 @@ export class RuleParser {
         let endIndex = rawString.indexOf(this.programEnd);
 
         if (startIndex === -1 || endIndex === -1) {
-            console.error("Found no program start or end");
-            return [];
+            throw new Error("Did not find program start or end");
         }
 
         const validCode = rawString
@@ -93,7 +92,7 @@ export class RuleParser {
      * @param {StaticRuleSystem} staticRuleSystem - Parsed FUNGI commands.
      * @param {string} input - The input that should be processed.
      */
-    execute(staticRuleSystem, input) {
+    calculateResponse(staticRuleSystem, input) {
         let response = 'Sorry, no match';
         staticRuleSystem.getRules().forEach(staticRule => {
             if (staticRule.trigger.toLowerCase().includes(input.toLowerCase())) {
@@ -103,27 +102,13 @@ export class RuleParser {
         return response;
     }
 
-    /**
-     * Execute a single command.
-     * @param {Object} command - Single command object.
-     * @param {string} input - the message that should be replied to.
-     */
-    executeCommand(command, input) {
-        if (command.command === "ONREPLY" && input && input.includes(command.replyMessage)) {
-            return command.respondMessage;
-        } else {
-            return "Invalid input. Mention should contain: '" + command.replyMessage + "'";
-        }
-    }
-
     containsValidFUNGI(content) {
         if (!content.includes(this.programStart) && !content.includes(this.programEnd)) {
             return false;
         }
 
         try {
-            const tokens = this.tokenize(content);
-            this.parse(tokens);
+            this.parse(content);
             return true;
         } catch (error) {
             return false;

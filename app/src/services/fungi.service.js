@@ -82,8 +82,8 @@ export class FungiService {
         const SUCCESS = true;
         const FAIL = false;
         console.log("Received fungi code: " + code);
-        const tokens = this.ruleParser.tokenize(code);
-        this.fungiState.setCommands(this.ruleParser.parse(tokens));
+        const staticRuleSystem = this.ruleParser.parse(code);
+        this.fungiState.setRuleSystem(staticRuleSystem);
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
     }
@@ -121,7 +121,7 @@ export class FungiService {
 
     async generateAnswerToText(content) {
         console.log("generateAnswerToStatus with content", content);
-        const fungiResult = this.ruleParser.execute(this.fungiState.getCommands(), content);
+        const fungiResult = this.ruleParser.calculateResponse(this.fungiState.getRuleSystem(), content);
         console.log("Response: '" + fungiResult + "'");
         return fungiResult;
     }

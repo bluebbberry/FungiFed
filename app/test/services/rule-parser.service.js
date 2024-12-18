@@ -17,25 +17,25 @@ const input4 = 'hello';
 describe('Test parser', function(){
     it('process code 1 correctly', function(){
         const staticRuleSystem = ruleParser.parse(testCode1);
-        const response = ruleParser.execute(staticRuleSystem, input);
+        const response = ruleParser.calculateResponse(staticRuleSystem, input);
         assert.equal(response, 'Hi there! How can I assist you today?');
     });
 
     it('process code 2 correctly', function(){
         const staticRuleSystem = ruleParser.parse(testCode1);
-        const response = ruleParser.execute(staticRuleSystem, input2);
+        const response = ruleParser.calculateResponse(staticRuleSystem, input2);
         assert.equal(response, 'Today\'s weather in {city} is {condition}');
     });
 
     it('process code 3 correctly', function(){
         const staticRuleSystem = ruleParser.parse(testCode1);
-        const response = ruleParser.execute(staticRuleSystem, input3);
+        const response = ruleParser.calculateResponse(staticRuleSystem, input3);
         assert.equal(response, 'Good morning! For support, message someone important');
     });
 
     it('process code 4 correctly', function(){
         const staticRuleSystem = ruleParser.parse(testCode1);
-        const response = ruleParser.execute(staticRuleSystem, input4);
+        const response = ruleParser.calculateResponse(staticRuleSystem, input4);
         assert.equal(response, 'Hi there! How can I assist you today?');
     });
 });

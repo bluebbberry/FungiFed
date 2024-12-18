@@ -1,24 +1,15 @@
 export class FungiState {
-    constructor(code, commands, health = 0) {
-        this.code = code;
-        this.commands = commands;
+    constructor(ruleSystem, health = 0) {
+        this.ruleSystem = ruleSystem;
         this.health = health;
     }
 
-    getCode() {
-        return this.code;
+    getRuleSystem() {
+        return this.ruleSystem;
     }
 
-    setCode(code) {
-        this.code = code;
-    }
-
-    getCommands() {
-        return this.commands;
-    }
-
-    setCommands(commands) {
-        this.commands = commands;
+    setRuleSystem(commands) {
+        this.ruleSystem = commands;
     }
 
     getHealth() {
