@@ -90,15 +90,17 @@ export class RuleParser {
 
     /**
      * Execute the parsed commands.
-     * @param {Array} commands - Parsed FUNGI commands.
+     * @param {StaticRuleSystem} staticRuleSystem - Parsed FUNGI commands.
      * @param {string} input - The input that should be processed.
      */
-    execute(commands, input) {
-        let temp = input;
-        commands.forEach(command => {
-            temp = this.executeCommand(command, temp);
+    execute(staticRuleSystem, input) {
+        let response = input;
+        staticRuleSystem.getRules().forEach(staticRule => {
+            if (staticRule.trigger === input) {
+                response = staticRule.response;
+            }
         });
-        return temp;
+        return response;
     }
 
     /**
