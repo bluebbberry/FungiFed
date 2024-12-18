@@ -1,4 +1,4 @@
-import { FungiParser } from "./fungi-parser.service.js";
+import { RuleParser } from "./rule-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
 import { send, sendReply } from "./post.util.service.js";
@@ -23,7 +23,7 @@ export class FungiService {
         this.exampleCode = `
             FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
         `;
-        this.fungiParser = FungiParser.parser();
+        this.ruleParser = RuleParser.parser();
     }
 
     static fungiService() {
@@ -82,8 +82,8 @@ export class FungiService {
         const SUCCESS = true;
         const FAIL = false;
         console.log("Received fungi code: " + code);
-        const tokens = this.fungiParser.tokenize(code);
-        this.fungiState.setCommands(this.fungiParser.parse(tokens));
+        const tokens = this.ruleParser.tokenize(code);
+        this.fungiState.setCommands(this.ruleParser.parse(tokens));
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
     }
@@ -104,7 +104,7 @@ export class FungiService {
         for (let i = 0; i < statuses.length; i++) {
             const status = statuses[i];
             const decodedStatusContent = decode(status.content);
-            if (this.fungiParser.containsValidFUNGI(decodedStatusContent)) {
+            if (this.ruleParser.containsValidFUNGI(decodedStatusContent)) {
                 console.log("found status with FUNGI code");
                 return status;
             }
@@ -121,7 +121,7 @@ export class FungiService {
 
     async generateAnswerToText(content) {
         console.log("generateAnswerToStatus with content", content);
-        const fungiResult = this.fungiParser.execute(this.fungiState.getCommands(), content);
+        const fungiResult = this.ruleParser.execute(this.fungiState.getCommands(), content);
         console.log("Response: '" + fungiResult + "'");
         return fungiResult;
     }
