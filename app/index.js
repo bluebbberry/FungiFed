@@ -4,6 +4,7 @@ import userController from "./src/controllers/user.controller.js";
 import fungiController from "./src/controllers/fungi.controller.js";
 import { FungiService } from "./src/services/fungi.service.js";
 import notificationsController from "./src/controllers/notifications.controller.js";
+import {FungiHistoryService} from "./src/services/fungi-history.service.js";
 
 // ============== REST API ===================
 const app = express();
@@ -27,3 +28,6 @@ app.listen(PORT, () => {
 const fungiService = FungiService.fungiService;
 fungiService.startFungiLifecycle();
 fungiService.startAnsweringMentions();
+
+const fungiHistoryService = FungiHistoryService.fungiHistoryService;
+fungiHistoryService.startCheckingForUserFeedback();

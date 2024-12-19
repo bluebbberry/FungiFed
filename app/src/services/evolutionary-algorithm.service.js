@@ -142,12 +142,12 @@ export class EvolutionaryAlgorithm {
 }
 
 // Example Usage
-const history = new FungiHistory([
-    new FungiState(new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), 0.9),
-    new FungiState(new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), 0.8)
-]);
-const currentSystem = new StaticRuleSystem([new StaticRule("support", "Support is available.")]);
-
-const evolutionaryAlgorithm = new EvolutionaryAlgorithm();
-const newRuleSystem = evolutionaryAlgorithm.evolve(history, currentSystem);
-console.log(newRuleSystem);
+// const history = new FungiHistory([
+//     new FungiState(new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), 0.9),
+//     new FungiState(new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), 0.8)
+// ]);
+// const currentSystem = new StaticRuleSystem([new StaticRule("support", "Support is available.")]);
+//
+// const evolutionaryAlgorithm = new EvolutionaryAlgorithm();
+// const newRuleSystem = evolutionaryAlgorithm.evolve(history, currentSystem);
+// console.log(newRuleSystem);

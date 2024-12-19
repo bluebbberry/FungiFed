@@ -2,6 +2,7 @@ export class FungiState {
     constructor(ruleSystem, fitness = 0) {
         this.ruleSystem = ruleSystem;
         this.fitness = fitness;
+        this.statuses = [];
     }
 
     getRuleSystem() {
@@ -18,5 +19,13 @@ export class FungiState {
 
     setFitness(health) {
         this.fitness = health;
+    }
+
+    getStatuses() {
+        return this.statuses;
+    }
+
+    setStatuses(statuses) {
+        this.statuses = statuses;
     }
 }
