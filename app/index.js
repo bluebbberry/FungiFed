@@ -5,6 +5,7 @@ import fungiController from "./src/controllers/fungi.controller.js";
 import { FungiService } from "./src/services/fungi.service.js";
 import notificationsController from "./src/controllers/notifications.controller.js";
 import {FungiHistoryService} from "./src/services/fungi-history.service.js";
+import {MycelialFungiHistoryService} from "./src/services/mycelial-fungi-history.service.js";
 
 // ============== REST API ===================
 const app = express();
@@ -31,3 +32,6 @@ fungiService.startAnsweringMentions();
 
 const fungiHistoryService = FungiHistoryService.fungiHistoryService;
 fungiHistoryService.startCheckingForUserFeedbackAndCalculateHistoryFitness();
+
+const mycelialHistoryService = MycelialFungiHistoryService.mycelialFungiHistoryService;
+mycelialHistoryService.startAggregatingMycelialData();

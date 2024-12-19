@@ -18,8 +18,8 @@
 import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
 
-export class RuleParser {
-    static parser = new RuleParser();
+export class RuleParserService {
+    static parser = new RuleParserService();
 
     constructor() {
         this.variables = {}; // Store variables for execution

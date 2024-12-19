@@ -1,4 +1,4 @@
-import { RuleParser } from "./rule-parser.service.js";
+import { RuleParserService } from "./rule-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
 import { cronToHumanReadable, send, sendReply } from "./post.util.service.js";
@@ -8,6 +8,7 @@ import { FungiState } from "../model/FungiState.js";
 import * as Config from "../configs/config.js";
 import {FungiHistoryService} from "./fungi-history.service.js";
 import {EvolutionaryAlgorithm} from "./evolutionary-algorithm.service.js";
+import {MycelialFungiHistoryService} from "./mycelial-fungi-history.service.js";
 
 /**
  * A fungi has the following four life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -28,7 +29,7 @@ export class FungiService {
         this.exampleCode = `
             FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
         `;
-        this.ruleParser = RuleParser.parser;
+        this.ruleParser = RuleParserService.parser;
     }
 
     startFungiLifecycle() {
@@ -54,7 +55,7 @@ export class FungiService {
     async runInitialSearch() {
         // 1. initial search
         console.log("runInitialSearch");
-        const status = await this.getStatusWithValidFUNGICodeFromFungiTag();
+        const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
         if (status) {
             this.fungiState.setRuleSystem(decode(status.content));
         }
@@ -97,27 +98,8 @@ export class FungiService {
         return SUCCESS;
     }
 
-    async getStatusesFromFungiTag() {
-        const statuses = await masto.v1.timelines.tag.$select(Config.MYCELIAL_HASHTAG).list({
-            limit: 30,
-        });
-        return statuses;
-    }
-
     postStatusUnderFungiTag(message) {
         send(message + "#" + Config.MYCELIAL_HASHTAG);
-    }
-
-    async getStatusWithValidFUNGICodeFromFungiTag() {
-        const statuses = await this.getStatusesFromFungiTag();
-        for (let i = 0; i < statuses.length; i++) {
-            const status = statuses[i];
-            const decodedStatusContent = decode(status.content);
-            if (this.ruleParser.containsValidFUNGI(decodedStatusContent)) {
-                console.log("found status with FUNGI code");
-                return status;
-            }
-        }
     }
 
     async checkForMentionsAndLetFungiAnswer() {
