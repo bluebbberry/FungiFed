@@ -2,7 +2,6 @@
 import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
 import {FungiHistory} from "../model/FungiHistory.js";
-import {FungiState} from "../model/FungiState.js";
 
 export class EvolutionaryAlgorithm {
     static evolutionaryAlgorithm = new EvolutionaryAlgorithm();
