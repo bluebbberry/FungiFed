@@ -19,14 +19,12 @@ import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
 
 export class RuleParser {
+    static parser = new RuleParser();
+
     constructor() {
         this.variables = {}; // Store variables for execution
         this.programEnd = "FUNGIEND";
         this.programStart = "FUNGISTART";
-    }
-
-    static parser() {
-        return new RuleParser();
     }
 
     /**

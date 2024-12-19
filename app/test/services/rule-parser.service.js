@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { RuleParser } from "../../src/services/rule-parser.service.js";
 
-const ruleParser = RuleParser.parser();
+const ruleParser = RuleParser.parser;
 const testCode1 = `
 FUNGISTART
 |RULE:hello world|RESPONSE:Hi there! How can I assist you today?

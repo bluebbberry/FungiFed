@@ -24,6 +24,6 @@ app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
 });
 
-const fungiService = FungiService.fungiService();
+const fungiService = FungiService.fungiService;
 fungiService.startFungiLifecycle();
 fungiService.startAnsweringMentions();

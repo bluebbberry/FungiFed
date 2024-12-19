@@ -3,7 +3,7 @@ import { FungiService } from "../services/fungi.service.js";
 import { decode } from 'html-entities';
 
 const router = express.Router();
-const fungiService = FungiService.fungiService();
+const fungiService = FungiService.fungiService;
 
 // test if bot alive
 router.get("/", async (request, response) => {

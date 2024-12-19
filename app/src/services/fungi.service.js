@@ -17,17 +17,15 @@ import * as Config from "../configs/config.js";
  * 5. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 3, this time with the picked code
  */
 export class FungiService {
+    static fungiService = new FungiService();
+
     constructor() {
         this.fungiState = new FungiState(null, null);
         // Example input that is used in case nothing is found
         this.exampleCode = `
             FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
         `;
-        this.ruleParser = RuleParser.parser();
-    }
-
-    static fungiService() {
-        return new FungiService();
+        this.ruleParser = RuleParser.parser;
     }
 
     startFungiLifecycle() {
@@ -66,16 +64,16 @@ export class FungiService {
         console.log("runFungiLifecycle");
 
         // 2. new code execution
-        this.parseAndSetCommandsFromFungiCode(this.fungiState.getCode());
+        this.parseAndSetCommandsFromFungiCode(this.fungiState.getRuleSystem());
 
         // 3. calculate code health
         // TODO
 
         // 4. scrape and share code health
-        this.postStatusUnderFungiTag(this.fungiState.getCode() + " CodeHealth: " + this.fungiState.getHealth());
+        this.postStatusUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
         // 5. calculate mutation
-        this.fungiState.setCode(this.getStatusWithValidFUNGICodeFromFungiTag(this.fungiState.getCode()));
+        this.fungiState.setCode(this.getStatusWithValidFUNGICodeFromFungiTag(this.fungiState.getFitness()));
     }
 
     parseAndSetCommandsFromFungiCode(code) {
