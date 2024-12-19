@@ -1,7 +1,7 @@
 import { RuleParser } from "./rule-parser.service.js";
 import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
-import { send, sendReply } from "./post.util.service.js";
+import { cronToHumanReadable, send, sendReply } from "./post.util.service.js";
 import { getMentionsNotifications } from "./notifications.service.js";
 import { decode } from 'html-entities';
 import { FungiState } from "../model/FungiState.js";
@@ -35,7 +35,7 @@ export class FungiService {
                 cron.schedule(cronSchedule, () => {
                     this.runFungiLifecycle();
                 });
-                console.log("Scheduled fungi lifecycle " + this.cronToHumanReadable(cronSchedule));
+                console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
             });
         });
     }
@@ -45,7 +45,7 @@ export class FungiService {
         cron.schedule(answerSchedule, () => {
             this.checkForMentionsAndLetFungiAnswer();
         });
-        console.log("Scheduled fungi answering " + this.cronToHumanReadable(answerSchedule));
+        console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
     }
 
     async runInitialSearch() {
