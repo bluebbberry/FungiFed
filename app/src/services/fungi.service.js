@@ -6,15 +6,18 @@ import { getMentionsNotifications } from "./notifications.service.js";
 import { decode } from 'html-entities';
 import { FungiState } from "../model/FungiState.js";
 import * as Config from "../configs/config.js";
+import {FungiHistoryService} from "./fungi-history.service.js";
+import {EvolutionaryAlgorithm} from "./evolutionary-algorithm.service.js";
 
 /**
- * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
+ * A fungi has the following four life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
  *
- * 1. INITIAL SEARCH: Search under seed hashtag for FUNGI code (FUNGI is a custom DSL) - if success: procee, if not: sleep and try again.
- * 2. NEW CODE EXECUTION: The code is executed and feedback from user interactions is collected
- * 3. CALCULATE CODE HEALTH: After a while, the results are evaluated and a code health number is calculated
- * 4. SCRAPE & SHARE CODE HEALTH: The result with the related code is posted under the nutrition hashtag for other bots to process; at the same time, new code, potentially with evaulation results is scraped from the hashtag (of course, this may also come from human users).
- * 5. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 3, this time with the picked code
+ * 1. INITIAL SEARCH: Search under seed hashtag for FUNGI code (FUNGI is a custom DSL) - if success: proceed, if not: sleep and try again.
+ * 2. SHARE CODE HEALTH: The result with the related code is posted under the nutrition hashtag for other bots to process; at the same time, new code, potentially with evaulation results is scraped from the hashtag (of course, this may also come from human users).
+ * 3. NEW CODE EXECUTION: The code is executed and feedback from user interactions is collected
+ * 4. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 2, this time with the picked code
+ * IN PARALLEL: CALCULATE CODE HEALTH: Through collecting user feedback, the results are evaluated and a code fitness number is calculated
+ * IN PARALLEL: Aggregate feedback from other fungi through mysecial hashtag and include it in mutation
  */
 export class FungiService {
     static fungiService = new FungiService();
@@ -58,22 +61,30 @@ export class FungiService {
         else {
             this.fungiState.setRuleSystem(this.exampleCode);
         }
+        let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        fungiHistory.push(this.fungiState);
     }
 
     async runFungiLifecycle() {
         console.log("runFungiLifecycle");
 
-        // 2. new code execution
-        this.parseAndSetCommandsFromFungiCode(this.fungiState.getRuleSystem());
-
-        // 3. calculate code health
-        // TODO
-
         // 4. scrape and share code health
         this.postStatusUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
-        // 5. calculate mutation
-        this.fungiState.setRuleSystem(this.getStatusWithValidFUNGICodeFromFungiTag(this.fungiState.getFitness()));
+        // 2. calculate and apply mutation
+        if (FungiHistoryService.fungiHistoryService.getFungiHistory().getFungiStates().length === 1) {
+            this.mutateRuleSystem();
+        }
+
+        // 3. new code execution
+        this.parseAndSetCommandsFromFungiCode(this.fungiState.getRuleSystem());
+    }
+
+    mutateRuleSystem() {
+        const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        const evolvedRuleSystem = EvolutionaryAlgorithm.evolutionaryAlgorithm.evolve(fungiHistory, this.fungiState.getRuleSystem());
+        this.fungiState = new FungiState(evolvedRuleSystem, 0);
+        fungiHistory.push(this.fungiState);
     }
 
     parseAndSetCommandsFromFungiCode(code) {
