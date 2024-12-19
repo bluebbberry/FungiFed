@@ -14,11 +14,12 @@ export class EvolutionaryAlgorithm {
     /**
      * Evolves a new rule system based on historical data and the current system.
      * @param {FungiHistory} history - Array of objects with `ruleSystem` and `fitness`.
+     * @param {MycelialFungiHistory} mycelialHistory - Array of objects with `ruleSystem` and `fitness`.
      * @param {StaticRuleSystem} currentSystem - The currently selected rule system.
      * @returns {StaticRuleSystem} - A new mutated rule system.
      */
-    evolve(history, currentSystem) {
-        const pool = this.createPool(history, currentSystem);
+    evolve(history, mycelialHistory, currentSystem) {
+        const pool = this.createPool(history, mycelialHistory, currentSystem);
 
         // Perform mutation and crossover to generate a new rule system
         let newRuleSystem = this.mutate(this.selectParent(pool));
@@ -35,14 +36,23 @@ export class EvolutionaryAlgorithm {
     /**
      * Creates a selection pool based on fitness values.
      * @param {FungiHistory} history - Array of {ruleSystem, fitness}.
+     * @param {MycelialFungiHistory} mycelialHistory - Array of objects with `ruleSystem` and `fitness`.
      * @param {StaticRuleSystem} currentSystem - The current rule system.
      * @returns {Array} - A pool of rule systems weighted by fitness.
      */
-    createPool(history, currentSystem) {
+    createPool(history, mycelialHistory, currentSystem) {
         const pool = [];
 
         // Add entries to the pool proportional to their fitness
         history.getFungiStates().forEach(entry => {
+            const weight = Math.ceil(entry.fitness * 10); // Scale fitness for pool weighting
+            for (let i = 0; i < weight; i++) {
+                pool.push(entry.ruleSystem);
+            }
+        });
+
+        // Add entries to the pool proportional to their fitness
+        mycelialHistory.getFungiStates().forEach(entry => {
             const weight = Math.ceil(entry.fitness * 10); // Scale fitness for pool weighting
             for (let i = 0; i < weight; i++) {
                 pool.push(entry.ruleSystem);
