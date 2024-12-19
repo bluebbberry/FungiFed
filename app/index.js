@@ -30,4 +30,4 @@ fungiService.startFungiLifecycle();
 fungiService.startAnsweringMentions();
 
 const fungiHistoryService = FungiHistoryService.fungiHistoryService;
-fungiHistoryService.startCheckingForUserFeedback();
+fungiHistoryService.startCheckingForUserFeedbackAndCalculateHistoryFitness();
