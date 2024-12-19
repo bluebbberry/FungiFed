@@ -17,7 +17,7 @@ import {EvolutionaryAlgorithm} from "./evolutionary-algorithm.service.js";
  * 3. NEW CODE EXECUTION: The code is executed and feedback from user interactions is collected
  * 4. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 2, this time with the picked code
  * IN PARALLEL: CALCULATE CODE HEALTH: Through collecting user feedback, the results are evaluated and a code fitness number is calculated
- * IN PARALLEL: Aggregate feedback from other fungi through mysecial hashtag and include it in mutation
+ * IN PARALLEL: Aggregate feedback from other fungi through mycelial hashtag and include it in mutation
  */
 export class FungiService {
     static fungiService = new FungiService();
@@ -68,15 +68,15 @@ export class FungiService {
     async runFungiLifecycle() {
         console.log("runFungiLifecycle");
 
-        // 4. scrape and share code health
+        // 2. share code health
         this.postStatusUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
-        // 2. calculate and apply mutation
+        // 3. calculate and apply mutation
         if (FungiHistoryService.fungiHistoryService.getFungiHistory().getFungiStates().length === 1) {
             this.mutateRuleSystem();
         }
 
-        // 3. new code execution
+        // 4. new code execution
         this.parseAndSetCommandsFromFungiCode(this.fungiState.getRuleSystem());
     }
 
