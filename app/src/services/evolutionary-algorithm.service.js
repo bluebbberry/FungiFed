@@ -1,6 +1,8 @@
 // Evolutionary Algorithm for FUNGI Rule System Optimization
 import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
+import {FungiHistory} from "../model/FungiHistory.js";
+import {FungiState} from "../model/FungiState.js";
 
 export class EvolutionaryAlgorithm {
     static evolutionaryAlgorithm = new EvolutionaryAlgorithm();
@@ -12,7 +14,7 @@ export class EvolutionaryAlgorithm {
 
     /**
      * Evolves a new rule system based on historical data and the current system.
-     * @param {Array} history - Array of objects with `ruleSystem` and `fitness`.
+     * @param {FungiHistory} history - Array of objects with `ruleSystem` and `fitness`.
      * @param {StaticRuleSystem} currentSystem - The currently selected rule system.
      * @returns {StaticRuleSystem} - A new mutated rule system.
      */
@@ -33,7 +35,7 @@ export class EvolutionaryAlgorithm {
 
     /**
      * Creates a selection pool based on fitness values.
-     * @param {Array} history - Array of {ruleSystem, fitness}.
+     * @param {FungiHistory} history - Array of {ruleSystem, fitness}.
      * @param {StaticRuleSystem} currentSystem - The current rule system.
      * @returns {Array} - A pool of rule systems weighted by fitness.
      */
@@ -41,7 +43,7 @@ export class EvolutionaryAlgorithm {
         const pool = [];
 
         // Add entries to the pool proportional to their fitness
-        history.forEach(entry => {
+        history.getFungiStates().forEach(entry => {
             const weight = Math.ceil(entry.fitness * 10); // Scale fitness for pool weighting
             for (let i = 0; i < weight; i++) {
                 pool.push(entry.ruleSystem);
@@ -140,10 +142,10 @@ export class EvolutionaryAlgorithm {
 }
 
 // Example Usage
-const history = [
-    { ruleSystem: new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), fitness: 0.9 },
-    { ruleSystem: new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), fitness: 0.8 }
-];
+const history = new FungiHistory([
+    new FungiState(new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), 0.9),
+    new FungiState(new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), 0.8)
+]);
 const currentSystem = new StaticRuleSystem([new StaticRule("support", "Support is available.")]);
 
 const evolutionaryAlgorithm = new EvolutionaryAlgorithm();

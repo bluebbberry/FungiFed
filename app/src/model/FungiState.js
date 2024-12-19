@@ -1,7 +1,7 @@
 export class FungiState {
-    constructor(ruleSystem, health = 0) {
+    constructor(ruleSystem, fitness = 0) {
         this.ruleSystem = ruleSystem;
-        this.fitness = health;
+        this.fitness = fitness;
     }
 
     getRuleSystem() {

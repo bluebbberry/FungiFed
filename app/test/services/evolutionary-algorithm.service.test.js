@@ -2,23 +2,24 @@ import { assert } from 'chai';
 import {EvolutionaryAlgorithm} from "../../src/services/evolutionary-algorithm.service.js";
 import {StaticRuleSystem} from "../../src/model/StaticRuleSystem.js";
 import {StaticRule} from "../../src/model/StaticRule.js";
+import {FungiHistory} from "../../src/model/FungiHistory.js";
 
 describe('EvolutionaryAlgorithm', () => {
-    let algorithm, history, currentSystem;
+    let algorithm, fungiHistory, currentSystem;
 
     beforeEach(() => {
-        algorithm = new EvolutionaryAlgorithm();
-        history = [
+        algorithm = EvolutionaryAlgorithm.evolutionaryAlgorithm;
+        fungiHistory = new FungiHistory([
             { ruleSystem: new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), fitness: 0.9 },
             { ruleSystem: new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), fitness: 0.8 }
-        ];
+        ]);
         currentSystem = new StaticRuleSystem([new StaticRule("support", "Support is available.")]);
     });
 
     it('should create a weighted pool from history', () => {
-        const pool = algorithm.createPool(history, currentSystem);
+        const pool = algorithm.createPool(fungiHistory, currentSystem);
         assert.include(pool, currentSystem);
-        assert.isAbove(pool.length, history.length);
+        assert.isAbove(pool.length, fungiHistory.getFungiStates().length);
     });
 
     it('should mutate a rule system correctly', () => {
@@ -51,7 +52,7 @@ describe('EvolutionaryAlgorithm', () => {
     });
 
     it('should evolve a new rule system', () => {
-        const newSystem = algorithm.evolve(history, currentSystem);
+        const newSystem = algorithm.evolve(fungiHistory, currentSystem);
         assert.instanceOf(newSystem, StaticRuleSystem);
         assert.isNotEmpty(newSystem.getRules());
     });
