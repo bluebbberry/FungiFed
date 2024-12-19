@@ -1,5 +1,4 @@
 import { RuleParserService } from "./rule-parser.service.js";
-import masto from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
 import { cronToHumanReadable, send, sendReply } from "./post.util.service.js";
 import { getMentionsNotifications } from "./notifications.service.js";
