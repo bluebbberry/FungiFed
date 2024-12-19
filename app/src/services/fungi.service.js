@@ -20,7 +20,7 @@ export class FungiService {
     static fungiService = new FungiService();
 
     constructor() {
-        this.fungiState = new FungiState(null, null);
+        this.fungiState = new FungiState(null, 0);
         // Example input that is used in case nothing is found
         this.exampleCode = `
             FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
@@ -41,7 +41,7 @@ export class FungiService {
     }
 
     startAnsweringMentions() {
-        const answerSchedule = '*/5 * * * *';
+        const answerSchedule = '*/3 * * * *';
         cron.schedule(answerSchedule, () => {
             this.checkForMentionsAndLetFungiAnswer();
         });
@@ -53,10 +53,10 @@ export class FungiService {
         console.log("runInitialSearch");
         const status = await this.getStatusWithValidFUNGICodeFromFungiTag();
         if (status) {
-            this.fungiState.setCode(decode(status.content));
+            this.fungiState.setRuleSystem(decode(status.content));
         }
         else {
-            this.fungiState.setCode(this.exampleCode);
+            this.fungiState.setRuleSystem(this.exampleCode);
         }
     }
 
@@ -73,7 +73,7 @@ export class FungiService {
         this.postStatusUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
         // 5. calculate mutation
-        this.fungiState.setCode(this.getStatusWithValidFUNGICodeFromFungiTag(this.fungiState.getFitness()));
+        this.fungiState.setRuleSystem(this.getStatusWithValidFUNGICodeFromFungiTag(this.fungiState.getFitness()));
     }
 
     parseAndSetCommandsFromFungiCode(code) {
