@@ -1,17 +1,13 @@
 import { assert } from 'chai';
-import { FungiParser } from "../../src/services/fungi-parser.service.js";
+import { RuleParserService } from "../../src/services/rule-parser.service.js";
 
-const fungiParser = FungiParser.parser();
+const ruleParser = RuleParserService.parser;
 const testCode1 = `
 FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
 `;
 
 describe('Test parser', function(){
-    it('process code 1 correctly', function(){
-        const tokens = fungiParser.tokenize(testCode1);
-        const commands = fungiParser.parse(tokens);
-        const reply = fungiParser.execute(commands, "Hello");
-
-        assert.equal(reply, "Hello, Fediverse user!");
+    it('validate for FUNGI static rule system', function(){
+        assert.isFalse(ruleParser.containsValidFUNGI(testCode1));
     });
 });
