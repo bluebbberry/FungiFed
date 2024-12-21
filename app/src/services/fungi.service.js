@@ -116,7 +116,7 @@ export class FungiService {
     }
 
     shareStateUnderFungiTag(message) {
-        send(message + "#" + Config.MYCELIAL_HASHTAG);
+        send(message + " #" + Config.MYCELIAL_HASHTAG);
     }
 
     async checkForMentionsAndLetFungiAnswer() {
