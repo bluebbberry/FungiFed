@@ -58,7 +58,7 @@ export class FungiService {
             this.fungiState.setRuleSystem(this.defaultRuleSystem);
         }
         let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
-        fungiHistory.push(this.fungiState);
+        fungiHistory.getFungiStates().push(this.fungiState);
     }
 
     startAnsweringMentions() {
