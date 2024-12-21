@@ -137,6 +137,6 @@ export class RuleParserService {
             return parts.join("|");
         });
 
-        return `${this.programStart}|${serializedRules.join("|RULE:")}|${this.programEnd}`;
+        return `${this.programStart}|${serializedRules.join("|")}|${this.programEnd}`;
     }
 }
