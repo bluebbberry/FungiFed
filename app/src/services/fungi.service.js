@@ -26,7 +26,7 @@ export class FungiService {
     constructor() {
         this.fungiState = new FungiState(null, 0);
         // Example input that is used in case nothing is found
-        this.exampleCode = `
+        this.defaultRuleSystem = `
             FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
         `;
         this.ruleParser = RuleParserService.parser;
@@ -46,16 +46,16 @@ export class FungiService {
     }
 
     async runInitialSearch() {
-        // 0. initial search
+        // 0. Initial search
         console.log("runInitialSearch");
         const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
         if (status) {
-            // 1. set as new state
+            // 1. New State: set found rule system as new state
             this.fungiState.setRuleSystem(decode(status.content));
         }
         else {
-            // 1. set as new state
-            this.fungiState.setRuleSystem(this.exampleCode);
+            // 1. New State: set default rule system as new state
+            this.fungiState.setRuleSystem(this.defaultRuleSystem);
         }
         let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         fungiHistory.push(this.fungiState);
@@ -76,13 +76,13 @@ export class FungiService {
         // 3. Calculate fitness of current state based on user feedback
         FungiStateFitnessService.fungiStateFitnessService.calculateForFungiState(this.fungiState);
 
-        // 4. share code health
+        // 4. Share code health
         this.shareStateUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
-        // 5. calculate mutation
+        // 5. Calculate mutation
         const evolvedRuleSystem = this.mutateRuleSystem();
 
-        // 1. run new fungi state
+        // 1. New State: set mutate rule system as new state
         this.fungiState = new FungiState(evolvedRuleSystem, 0);
         const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         fungiHistory.push(this.fungiState);
