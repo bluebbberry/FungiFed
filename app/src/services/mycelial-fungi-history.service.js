@@ -26,6 +26,7 @@ export class MycelialFungiHistoryService {
 
     async fetchNewEntriesFromMycelialHashtag() {
         const statuses = await this.getStatusesFromFungiTag();
+        console.log("Scraped " + statuses.length + " tag posts for mycerial history");
         let fungiStates = this.mycelialFungiHistory.getFungiStates();
         statuses.forEach((status) => {
             fungiStates.push(new FungiState(status, this.parseFitnessFromStatus(status)));

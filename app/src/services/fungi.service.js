@@ -35,8 +35,9 @@ export class FungiService {
     }
 
     startFungiLifecycle() {
-        this.runInitialSearch().then(() => {
+        this.runInitialSearch().then(async () => {
             this.startAnsweringMentions();
+            await MycelialFungiHistoryService.mycelialFungiHistoryService.fetchNewEntriesFromMycelialHashtag();
             this.runFungiLifecycle().then(() => {
                 const cronSchedule = '2 * * * *';
                 cron.schedule(cronSchedule, () => {
