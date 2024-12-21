@@ -44,7 +44,7 @@ export class MycelialFungiHistoryService {
 
     async getStatusesFromFungiTag() {
         const statuses = await masto.v1.timelines.tag.$select(Config.MYCELIAL_HASHTAG).list({
-            limit: 30,
+            limit: 40,
         });
         return statuses;
     }
