@@ -92,7 +92,6 @@ export class RuleParserService {
      */
     calculateResponse(staticRuleSystem, input) {
         let response = 'Sorry, no match';
-        console.info("INput: " + input);
         staticRuleSystem.getRules().forEach(staticRule => {
             if (input.toLowerCase().includes(staticRule.trigger.toLowerCase())) {
                 response = staticRule.response;
