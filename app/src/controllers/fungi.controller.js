@@ -2,6 +2,7 @@ import express from "express";
 import { FungiService } from "../services/fungi.service.js";
 import { decode } from 'html-entities';
 import {RuleParserService} from "../services/rule-parser.service.js";
+import {MycelialFungiHistoryService} from "../services/mycelial-fungi-history.service.js";
 
 const router = express.Router();
 const fungiService = FungiService.fungiService;
@@ -34,7 +35,7 @@ router.post("/askforreply", async (request, response) => {
 router.get("/tag", async (request, response) => {
     try {
         // Send message to mastodon server
-        const statuses = await fungiService.getStatusesFromFungiTag();
+        const statuses = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusesFromFungiTag();
         response.status(200).json({ requestBody: statuses });
     } catch (error) {
         console.error("Error fetching posts:", error);
