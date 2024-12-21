@@ -20,8 +20,8 @@ export class FungiHistoryService {
 
     updateFungiHistoryBasedOnUserFeedback() {
         this.fungiHistory.getFungiStates().forEach((fungiState) => {
-            fungiState.setStatuses(fungiState.getStatuses().map((status) => {
-                return StatusesService.statusesService.getStatusById(status.id);
+            fungiState.setStatuses(fungiState.getStatuses().map(async (status) => {
+                return await StatusesService.statusesService.getStatusById(status.id);
             }));
         });
     }

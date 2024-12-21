@@ -6,6 +6,7 @@ import { FungiService } from "./src/services/fungi.service.js";
 import notificationsController from "./src/controllers/notifications.controller.js";
 import {FungiHistoryService} from "./src/services/fungi-history.service.js";
 import {MycelialFungiHistoryService} from "./src/services/mycelial-fungi-history.service.js";
+import statusController from "./src/controllers/status.controller.js";
 
 // ============== REST API ===================
 const app = express();
@@ -19,6 +20,7 @@ app.use(cors({
 app.use('/user', userController);
 app.use('/fungi', fungiController);
 app.use('/notifications', notificationsController);
+app.use('/statuses', statusController);
 
 const PORT = 3000;
 

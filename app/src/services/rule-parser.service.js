@@ -92,8 +92,9 @@ export class RuleParserService {
      */
     calculateResponse(staticRuleSystem, input) {
         let response = 'Sorry, no match';
+        console.info("INput: " + input);
         staticRuleSystem.getRules().forEach(staticRule => {
-            if (staticRule.trigger.toLowerCase().includes(input.toLowerCase())) {
+            if (input.toLowerCase().includes(staticRule.trigger.toLowerCase())) {
                 response = staticRule.response;
             }
         });
@@ -111,5 +112,32 @@ export class RuleParserService {
         } catch (error) {
             return false;
         }
+    }
+
+    toRawString(ruleSystem) {
+        const rules = ruleSystem.getRules();
+
+        const serializedRules = rules.map(rule => {
+            const parts = [`RULE:${rule.trigger}`];
+
+            if (rule.response) {
+                parts.push(`RESPONSE:${rule.response}`);
+            }
+
+            if (rule.condition) {
+                parts.push(`CONDITION:${rule.condition}`);
+            }
+
+            if (rule.template) {
+                const templateParts = Object.entries(rule.template)
+                    .map(([key, value]) => `${key}=${value}`)
+                    .join(",");
+                parts.push(`TEMPLATE:${templateParts}`);
+            }
+
+            return parts.join("|");
+        });
+
+        return `${this.programStart}|${serializedRules.join("|")}|${this.programEnd}`;
     }
 }

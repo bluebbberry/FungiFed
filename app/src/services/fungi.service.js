@@ -80,7 +80,8 @@ export class FungiService {
         FungiStateFitnessService.fungiStateFitnessService.calculateForFungiState(this.fungiState);
 
         // 4. Share code health
-        this.shareStateUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
+        const rawCode = this.ruleParser.toRawString(this.fungiState.getRuleSystem());
+        this.shareStateUnderFungiTag(rawCode + " Fitness: " + this.fungiState.getFitness());
 
         // 5. Calculate mutation
         const evolvedRuleSystem = this.mutateRuleSystem();
@@ -109,20 +110,20 @@ export class FungiService {
     setCommandsFromFungiCode(staticRuleSystem) {
         const SUCCESS = true;
         const FAIL = false;
-        console.log("Received fungi code: " + staticRuleSystem);
+        console.log("Received fungi code: " + this.ruleParser.toRawString(staticRuleSystem));
         this.fungiState.setRuleSystem(staticRuleSystem);
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
     }
 
     shareStateUnderFungiTag(message) {
-        send(message + "#" + Config.MYCELIAL_HASHTAG);
+        send(message + " #" + Config.MYCELIAL_HASHTAG);
     }
 
     async checkForMentionsAndLetFungiAnswer() {
         const mentions = await getMentionsNotifications();
         for (const mention of mentions) {
-            const answer = await this.generateAnswerToText(mention.status.content);
+            const answer = await this.generateAnswerToText(decode(mention.status.content));
             await sendReply(answer, mention.status);
         }
     }
