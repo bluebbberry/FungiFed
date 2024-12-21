@@ -41,7 +41,8 @@ describe('EvolutionaryAlgorithm', () => {
 
     it('should mutate a rule system correctly', () => {
         console.log("Mutating rule system:", currentSystem);
-        const mutatedSystem = algorithm.mutate(currentSystem);
+        const pool = algorithm.createPool(fungiHistory, new MycelialFungiHistory([]), currentSystem);
+        const mutatedSystem = algorithm.mutate(currentSystem, pool);
 
         console.log("Mutated rule system:", mutatedSystem);
         assert.instanceOf(mutatedSystem, StaticRuleSystem);

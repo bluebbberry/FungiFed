@@ -8,7 +8,7 @@ export class EvolutionaryAlgorithm {
     static evolutionaryAlgorithm = new EvolutionaryAlgorithm();
 
     constructor() {
-        this.mutationRate = 0.1; // Probability of mutation
+        this.mutationRate = 0.3; // Probability of mutation
         this.crossoverRate = 0.7; // Probability of crossover
     }
 
@@ -23,7 +23,7 @@ export class EvolutionaryAlgorithm {
         const pool = this.createPool(history, mycelialHistory, currentSystem);
 
         // Perform mutation and crossover to generate a new rule system
-        let newRuleSystem = this.mutate(this.selectParent(pool));
+        let newRuleSystem = this.mutate(this.selectParent(pool), pool);
 
         // Optionally, add crossover for diversity
         if (Math.random() < this.crossoverRate) {
@@ -76,28 +76,27 @@ export class EvolutionaryAlgorithm {
 
     /**
      * Mutates a rule system by modifying, adding, or removing rules.
-     * @param {StaticRuleSystem} ruleSystem - The rule system to mutate.
+     * @param {StaticRuleSystem} parent - The rule system to mutate.
+     * @param {RuleSystemPool} pool - Pool of RuleSystems in which to mutate
      * @returns {StaticRuleSystem} - A mutated rule system.
      */
-    mutate(ruleSystem) {
-        const mutatedRules = ruleSystem.getRules().map(rule => {
-            if (Math.random() < this.mutationRate) {
-                return this.mutateRule(rule);
-            }
-            return rule;
-        });
+    mutate(parent, pool) {
+        const ruleClones = parent.getRules().map(rule => new StaticRule(rule.trigger, rule.response));
 
         // Optionally add a new random rule
         if (Math.random() < this.mutationRate) {
-            mutatedRules.push(this.generateRandomRule());
+            console.log("Mutation occurred!");
+            const ruleA = this.pickRandomRule(pool);
+            const ruleB = this.pickRandomRule(pool);
+            ruleClones.push(new StaticRule(ruleA.trigger, ruleB.response));
         }
 
         // Optionally remove a random rule
-        if (mutatedRules.length > 1 && Math.random() < this.mutationRate) {
-            mutatedRules.splice(Math.floor(Math.random() * mutatedRules.length), 1);
+        if (ruleClones.length > 1 && Math.random() < this.mutationRate) {
+            ruleClones.splice(Math.floor(Math.random() * ruleClones.length), 1);
         }
 
-        return new StaticRuleSystem(mutatedRules);
+        return new StaticRuleSystem(ruleClones);
     }
 
     /**
@@ -128,6 +127,19 @@ export class EvolutionaryAlgorithm {
         const response = responses[Math.floor(Math.random() * responses.length)];
 
         return new StaticRule(trigger, response);
+    }
+
+    /**
+     *
+     * @param {RuleSystemPool} pool
+     */
+    pickRandomRule(pool) {
+        const rndRuleSystem = this.getRandomElementOfArray(pool.getRuleSystems());
+        return this.getRandomElementOfArray(rndRuleSystem.getRules());
+    }
+
+    getRandomElementOfArray(array) {
+        return array[Math.floor(Math.random() * array.length)];
     }
 
     /**
