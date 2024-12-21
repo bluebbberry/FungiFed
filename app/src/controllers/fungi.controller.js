@@ -43,7 +43,7 @@ router.get("/tag", async (request, response) => {
 // post statuses to hashtag
 router.post("/tag", async (request, response) => {
     const body = request.body;
-    await fungiService.postStatusUnderFungiTag(body["message"]);
+    await fungiService.shareStateUnderFungiTag(body["message"]);
     const success = true;
     response.status(200).json({ responseBody: success });
 });
