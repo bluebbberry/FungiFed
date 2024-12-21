@@ -21,6 +21,7 @@
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
-    "chai": "^5.1.2"
+    "chai": "^5.1.2",
+    "nyc": "^17.1.0"
   }
 }
