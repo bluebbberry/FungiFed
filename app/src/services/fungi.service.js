@@ -49,16 +49,18 @@ export class FungiService {
 
     async runInitialSearch() {
         // 0. Initial search
-        console.log("runInitialSearch");
+        console.log("\n=== === === LIFECYCLE PHASE 0 - INITIAL SEARCH === === ===");
         const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
         if (status) {
             // 1. New State: set found rule system as new state
-            console.log("Set rule system of tag");
+            console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE === === ===");
+            console.log("Set rule system found on hashtag '" + Config.MYCELIAL_HASHTAG + "'");
             const ruleSystem = RuleParserService.parser.parse(decode(status.content));
             this.fungiState.setRuleSystem(ruleSystem);
         }
         else {
             // 1. New State: set default rule system as new state
+            console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE === === ===");
             console.log("Set default rule system");
             this.fungiState.setRuleSystem(this.defaultRuleSystem);
         }
@@ -67,28 +69,33 @@ export class FungiService {
     }
 
     startAnsweringMentions() {
-        // 2. Answer Questions by users
         const answerSchedule = '*/3 * * * *';
         cron.schedule(answerSchedule, () => {
+            // 2. Answer Questions by users
+            console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
             this.checkForMentionsAndLetFungiAnswer();
         });
         console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
     }
 
     async runFungiLifecycle() {
-        console.log("runFungiLifecycle");
-
         // 3. Calculate fitness of current state based on user feedback
+        console.log("\n=== === === LIFECYCLE PHASE 3 - CALCULATE FITNESS BASED ON FEEDBACK === === ===");
         FungiStateFitnessService.fungiStateFitnessService.calculateFitnessForFungiState(this.fungiState);
 
         // 4. Share code health
+        console.log("\n=== === === LIFECYCLE PHASE 4 - SHARE OWN FITNESS WITH OTHER FUNGI === === ===");
         const rawCode = this.ruleParser.toRawString(this.fungiState.getRuleSystem());
         this.shareStateUnderFungiTag(rawCode + " Fitness: " + this.fungiState.getFitness());
 
         // 5. Calculate mutation
+        console.log("\n=== === === LIFECYCLE PHASE 5 - CALCULATE MUTATION OF CURRENT STATE === === ===");
         const evolvedRuleSystem = this.mutateRuleSystem();
+        console.log("Current state: " + RuleParserService.parser.toRawString(this.fungiState.getRuleSystem()));
+        console.log("Mutation:      " + RuleParserService.parser.toRawString(evolvedRuleSystem));
 
         // 1. New State: set mutate rule system as new state
+        console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE=== === ===");
         this.fungiState = new FungiState(evolvedRuleSystem, 0);
         const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         fungiHistory.getFungiStates().push(this.fungiState);
