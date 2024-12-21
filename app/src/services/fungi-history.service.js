@@ -15,7 +15,7 @@ export class FungiHistoryService {
         cron.schedule(checkForFeedbackSchedule, () => {
             this.updateFungiHistoryBasedOnUserFeedback();
         });
-        console.log("Scheduled fungi answering " + cronToHumanReadable(checkForFeedbackSchedule));
+        console.log("Scheduled checking user feedback " + cronToHumanReadable(checkForFeedbackSchedule));
     }
 
     updateFungiHistoryBasedOnUserFeedback() {

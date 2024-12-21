@@ -3,8 +3,12 @@ export class FungiStateFitnessService {
     static fungiStateFitnessService = new FungiStateFitnessService();
 
     calculateForFungiState(fungiState) {
-        const favouriteCountsPerStatus = fungiState.getStatuses.map(s => s.favouritesCount).reduce((a, b) => a + b, 0) / fungiState.getStatuses.length;
-        fungiState.setFitness(this.calculateFitnessThroughNormalization(favouriteCountsPerStatus));
+        if (fungiState.getStatuses().length > 0) {
+            const favouriteCountsPerStatus = fungiState.getStatuses.map(s => s.favouritesCount).reduce((a, b) => a + b, 0) / fungiState.getStatuses.length;
+            fungiState.setFitness(this.calculateFitnessThroughNormalization(favouriteCountsPerStatus));
+        } else {
+            console.error("ERROR: No fungi states yet");
+        }
     }
 
     /**
