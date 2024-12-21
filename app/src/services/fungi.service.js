@@ -105,6 +105,8 @@ export class FungiService {
     mutateRuleSystem() {
         const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         const mycelialFungiHistory = MycelialFungiHistoryService.mycelialFungiHistoryService.getMycelialFungiHistory();
+        console.log("fungiHistory: " + fungiHistory.getFungiStates().length + " entries");
+        console.log("mycelial fungiHistory: " + mycelialFungiHistory.getFungiStates().length + " entries");
         const evolvedRuleSystem = EvolutionaryAlgorithm.evolutionaryAlgorithm.evolve(
             fungiHistory,
             mycelialFungiHistory,
