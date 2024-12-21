@@ -10,7 +10,7 @@ export class FungiHistoryService {
         this.fungiHistory = new FungiHistory([]);
     }
 
-    startCheckingForUserFeedbackAndCalculateHistoryFitness() {
+    startUpdatingUserFeedback() {
         const checkForFeedbackSchedule = '*/2 * * * *';
         cron.schedule(checkForFeedbackSchedule, () => {
             this.updateFungiHistoryBasedOnUserFeedback();

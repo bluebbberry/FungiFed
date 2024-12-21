@@ -30,7 +30,7 @@ const fungiService = FungiService.fungiService;
 fungiService.startFungiLifecycle();
 
 const fungiHistoryService = FungiHistoryService.fungiHistoryService;
-fungiHistoryService.startCheckingForUserFeedbackAndCalculateHistoryFitness();
+fungiHistoryService.startUpdatingUserFeedback();
 
 const mycelialHistoryService = MycelialFungiHistoryService.mycelialFungiHistoryService;
 mycelialHistoryService.startAggregatingMycelialData();
