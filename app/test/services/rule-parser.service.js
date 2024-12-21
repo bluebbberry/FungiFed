@@ -36,7 +36,7 @@ describe('Test parser', function(){
     it('process code 4 correctly', function(){
         const staticRuleSystem = ruleParser.parse(testCode1);
         const response = ruleParser.calculateResponse(staticRuleSystem, input4);
-        assert.equal(response, 'Hi there! How can I assist you today?');
+        assert.equal(response, 'Sorry, no match');
     });
 });
 

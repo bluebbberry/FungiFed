@@ -123,7 +123,7 @@ export class FungiService {
     async checkForMentionsAndLetFungiAnswer() {
         const mentions = await getMentionsNotifications();
         for (const mention of mentions) {
-            const answer = await this.generateAnswerToText(mention.status.content);
+            const answer = await this.generateAnswerToText(decode(mention.status.content));
             await sendReply(answer, mention.status);
         }
     }
