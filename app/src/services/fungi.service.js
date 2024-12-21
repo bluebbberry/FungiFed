@@ -53,11 +53,13 @@ export class FungiService {
         const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
         if (status) {
             // 1. New State: set found rule system as new state
+            console.log("Set rule system of tag");
             const ruleSystem = RuleParserService.parser.parse(decode(status.content));
             this.fungiState.setRuleSystem(ruleSystem);
         }
         else {
             // 1. New State: set default rule system as new state
+            console.log("Set default rule system");
             this.fungiState.setRuleSystem(this.defaultRuleSystem);
         }
         let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
@@ -77,7 +79,7 @@ export class FungiService {
         console.log("runFungiLifecycle");
 
         // 3. Calculate fitness of current state based on user feedback
-        FungiStateFitnessService.fungiStateFitnessService.calculateForFungiState(this.fungiState);
+        FungiStateFitnessService.fungiStateFitnessService.calculateFitnessForFungiState(this.fungiState);
 
         // 4. Share code health
         const rawCode = this.ruleParser.toRawString(this.fungiState.getRuleSystem());
