@@ -3,6 +3,8 @@ import {EvolutionaryAlgorithm} from "../../src/services/evolutionary-algorithm.s
 import {StaticRuleSystem} from "../../src/model/StaticRuleSystem.js";
 import {StaticRule} from "../../src/model/StaticRule.js";
 import {FungiHistory} from "../../src/model/FungiHistory.js";
+import {MycelialFungiHistory} from "../../src/model/MycelialFungiHistory.js";
+import {FungiState} from "../../src/model/FungiState.js";
 
 describe('EvolutionaryAlgorithm', () => {
     let algorithm, fungiHistory, currentSystem;
@@ -10,16 +12,16 @@ describe('EvolutionaryAlgorithm', () => {
     beforeEach(() => {
         algorithm = EvolutionaryAlgorithm.evolutionaryAlgorithm;
         fungiHistory = new FungiHistory([
-            { ruleSystem: new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), fitness: 0.9 },
-            { ruleSystem: new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), fitness: 0.8 }
+            new FungiState(new StaticRuleSystem([new StaticRule("hello", "Hi there!")]), 0.9),
+            new FungiState(new StaticRuleSystem([new StaticRule("pricing", "Check our pricing.")]), 0.8)
         ]);
         currentSystem = new StaticRuleSystem([new StaticRule("support", "Support is available.")]);
     });
 
     it('should create a weighted pool from history', () => {
-        const pool = algorithm.createPool(fungiHistory, currentSystem);
-        assert.include(pool, currentSystem);
-        assert.isAbove(pool.length, fungiHistory.getFungiStates().length);
+        const pool = algorithm.createPool(fungiHistory, new MycelialFungiHistory([]), currentSystem);
+        assert.include(pool.getRuleSystems(), currentSystem);
+        assert.isAbove(pool.getRuleSystems().length, fungiHistory.getFungiStates().length);
     });
 
     it('should mutate a rule system correctly', () => {
@@ -52,7 +54,7 @@ describe('EvolutionaryAlgorithm', () => {
     });
 
     it('should evolve a new rule system', () => {
-        const newSystem = algorithm.evolve(fungiHistory, currentSystem);
+        const newSystem = algorithm.evolve(fungiHistory, new MycelialFungiHistory([]), currentSystem);
         assert.instanceOf(newSystem, StaticRuleSystem);
         assert.isNotEmpty(newSystem.getRules());
     });

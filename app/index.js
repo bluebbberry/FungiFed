@@ -28,10 +28,9 @@ app.listen(PORT, () => {
 
 const fungiService = FungiService.fungiService;
 fungiService.startFungiLifecycle();
-fungiService.startAnsweringMentions();
 
 const fungiHistoryService = FungiHistoryService.fungiHistoryService;
-fungiHistoryService.startCheckingForUserFeedbackAndCalculateHistoryFitness();
+fungiHistoryService.startUpdatingUserFeedback();
 
 const mycelialHistoryService = MycelialFungiHistoryService.mycelialFungiHistoryService;
 mycelialHistoryService.startAggregatingMycelialData();

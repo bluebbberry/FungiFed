@@ -8,6 +8,9 @@ import * as Config from "../configs/config.js";
 import {FungiHistoryService} from "./fungi-history.service.js";
 import {EvolutionaryAlgorithm} from "./evolutionary-algorithm.service.js";
 import {MycelialFungiHistoryService} from "./mycelial-fungi-history.service.js";
+import {FungiStateFitnessService} from "./fungi-state-fitness.service.js";
+import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
+import {StaticRule} from "../model/StaticRule.js";
 
 /**
  * A fungi has the following four life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -25,14 +28,15 @@ export class FungiService {
     constructor() {
         this.fungiState = new FungiState(null, 0);
         // Example input that is used in case nothing is found
-        this.exampleCode = `
-            FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
-        `;
+        this.defaultRuleSystem = new StaticRuleSystem([
+            new StaticRule("Hello", "Hello, Fediverse user!")
+        ]);
         this.ruleParser = RuleParserService.parser;
     }
 
     startFungiLifecycle() {
         this.runInitialSearch().then(() => {
+            this.startAnsweringMentions();
             this.runFungiLifecycle().then(() => {
                 const cronSchedule = '2 * * * *';
                 cron.schedule(cronSchedule, () => {
@@ -43,7 +47,25 @@ export class FungiService {
         });
     }
 
+    async runInitialSearch() {
+        // 0. Initial search
+        console.log("runInitialSearch");
+        const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
+        if (status) {
+            // 1. New State: set found rule system as new state
+            const ruleSystem = RuleParserService.parser.parse(decode(status.content));
+            this.fungiState.setRuleSystem(ruleSystem);
+        }
+        else {
+            // 1. New State: set default rule system as new state
+            this.fungiState.setRuleSystem(this.defaultRuleSystem);
+        }
+        let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        fungiHistory.getFungiStates().push(this.fungiState);
+    }
+
     startAnsweringMentions() {
+        // 2. Answer Questions by users
         const answerSchedule = '*/3 * * * *';
         cron.schedule(answerSchedule, () => {
             this.checkForMentionsAndLetFungiAnswer();
@@ -51,33 +73,23 @@ export class FungiService {
         console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
     }
 
-    async runInitialSearch() {
-        // 1. initial search
-        console.log("runInitialSearch");
-        const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
-        if (status) {
-            this.fungiState.setRuleSystem(decode(status.content));
-        }
-        else {
-            this.fungiState.setRuleSystem(this.exampleCode);
-        }
-        let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
-        fungiHistory.push(this.fungiState);
-    }
-
     async runFungiLifecycle() {
         console.log("runFungiLifecycle");
 
-        // 2. share code health
-        this.postStatusUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
+        // 3. Calculate fitness of current state based on user feedback
+        FungiStateFitnessService.fungiStateFitnessService.calculateForFungiState(this.fungiState);
 
-        // 3. calculate and apply mutation
-        if (FungiHistoryService.fungiHistoryService.getFungiHistory().getFungiStates().length === 1) {
-            this.mutateRuleSystem();
-        }
+        // 4. Share code health
+        this.shareStateUnderFungiTag(this.fungiState.getRuleSystem() + " Fitness: " + this.fungiState.getFitness());
 
-        // 4. new code execution
-        this.parseAndSetCommandsFromFungiCode(this.fungiState.getRuleSystem());
+        // 5. Calculate mutation
+        const evolvedRuleSystem = this.mutateRuleSystem();
+
+        // 1. New State: set mutate rule system as new state
+        this.fungiState = new FungiState(evolvedRuleSystem, 0);
+        const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        fungiHistory.getFungiStates().push(this.fungiState);
+        this.setCommandsFromFungiCode(evolvedRuleSystem);
     }
 
     mutateRuleSystem() {
@@ -87,21 +99,23 @@ export class FungiService {
             fungiHistory,
             mycelialFungiHistory,
             this.fungiState.getRuleSystem());
-        this.fungiState = new FungiState(evolvedRuleSystem, 0);
-        fungiHistory.push(this.fungiState);
+        return evolvedRuleSystem;
     }
 
-    parseAndSetCommandsFromFungiCode(code) {
+    /**
+     * @param {StaticRuleSystem} staticRuleSystem
+     * @returns {boolean}
+     */
+    setCommandsFromFungiCode(staticRuleSystem) {
         const SUCCESS = true;
         const FAIL = false;
-        console.log("Received fungi code: " + code);
-        const staticRuleSystem = this.ruleParser.parse(code);
+        console.log("Received fungi code: " + staticRuleSystem);
         this.fungiState.setRuleSystem(staticRuleSystem);
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
     }
 
-    postStatusUnderFungiTag(message) {
+    shareStateUnderFungiTag(message) {
         send(message + "#" + Config.MYCELIAL_HASHTAG);
     }
 

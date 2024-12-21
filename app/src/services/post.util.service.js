@@ -1,4 +1,5 @@
 import masto from "../configs/mastodonclient.js";
+import * as cron from "node-cron";
 
 async function send(message) {
     const status = await masto.v1.statuses.create({

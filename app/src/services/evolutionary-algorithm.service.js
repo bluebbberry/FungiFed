@@ -2,6 +2,7 @@
 import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
 import {FungiHistory} from "../model/FungiHistory.js";
+import {RuleSystemPool} from "../model/RuleSystemPool.js";
 
 export class EvolutionaryAlgorithm {
     static evolutionaryAlgorithm = new EvolutionaryAlgorithm();
@@ -38,39 +39,39 @@ export class EvolutionaryAlgorithm {
      * @param {FungiHistory} history - Array of {ruleSystem, fitness}.
      * @param {MycelialFungiHistory} mycelialHistory - Array of objects with `ruleSystem` and `fitness`.
      * @param {StaticRuleSystem} currentSystem - The current rule system.
-     * @returns {Array} - A pool of rule systems weighted by fitness.
+     * @returns {RuleSystemPool} - A pool of rule systems weighted by fitness.
      */
     createPool(history, mycelialHistory, currentSystem) {
-        const pool = [];
+        const pool = new RuleSystemPool([]);
 
         // Add entries to the pool proportional to their fitness
-        history.getFungiStates().forEach(entry => {
-            const weight = Math.ceil(entry.fitness * 10); // Scale fitness for pool weighting
+        history.getFungiStates().forEach(state => {
+            const weight = Math.ceil(state.fitness * 10); // Scale fitness for pool weighting
             for (let i = 0; i < weight; i++) {
-                pool.push(entry.ruleSystem);
+                pool.getRuleSystems().push(state.getRuleSystem());
             }
         });
 
         // Add entries to the pool proportional to their fitness
-        mycelialHistory.getFungiStates().forEach(entry => {
-            const weight = Math.ceil(entry.fitness * 10); // Scale fitness for pool weighting
+        mycelialHistory.getFungiStates().forEach(state => {
+            const weight = Math.ceil(state.fitness * 10); // Scale fitness for pool weighting
             for (let i = 0; i < weight; i++) {
-                pool.push(entry.ruleSystem);
+                pool.getRuleSystems().push(state.getRuleSystem());
             }
         });
 
         // Ensure current system is in the pool
-        pool.push(currentSystem);
+        pool.getRuleSystems().push(currentSystem);
         return pool;
     }
 
     /**
      * Selects a parent from the pool using random selection.
-     * @param {Array} pool - The selection pool of rule systems.
+     * @param {RuleSystemPool} pool - The selection pool of rule systems.
      * @returns {StaticRuleSystem} - A selected parent rule system.
      */
     selectParent(pool) {
-        return pool[Math.floor(Math.random() * pool.length)];
+        return pool.getRuleSystems()[Math.floor(Math.random() * pool.getRuleSystems().length)];
     }
 
     /**
