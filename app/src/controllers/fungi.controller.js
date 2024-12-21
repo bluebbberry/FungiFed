@@ -1,6 +1,7 @@
 import express from "express";
 import { FungiService } from "../services/fungi.service.js";
 import { decode } from 'html-entities';
+import {RuleParserService} from "../services/rule-parser.service.js";
 
 const router = express.Router();
 const fungiService = FungiService.fungiService;
@@ -16,7 +17,8 @@ router.get("/", async (request, response) => {
 router.post("/", async (request, response) => {
     const fungiCode = request.body;
     const decodedFungiCode = decode(fungiCode["content"]);
-    const success = fungiService.parseAndSetCommandsFromFungiCode(decodedFungiCode);
+    const staticRuleSystem = RuleParserService.parser.parse(decodedFungiCode);
+    const success = fungiService.setCommandsFromFungiCode(staticRuleSystem);
     response.status(200).json({ responseBody: success });
 });
 

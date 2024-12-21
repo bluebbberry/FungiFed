@@ -89,7 +89,7 @@ export class FungiService {
         this.fungiState = new FungiState(evolvedRuleSystem, 0);
         const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         fungiHistory.getFungiStates().push(this.fungiState);
-        this.parseAndSetCommandsFromFungiCode(evolvedRuleSystem);
+        this.setCommandsFromFungiCode(evolvedRuleSystem);
     }
 
     mutateRuleSystem() {
@@ -102,11 +102,14 @@ export class FungiService {
         return evolvedRuleSystem;
     }
 
-    parseAndSetCommandsFromFungiCode(code) {
+    /**
+     * @param {StaticRuleSystem} staticRuleSystem
+     * @returns {boolean}
+     */
+    setCommandsFromFungiCode(staticRuleSystem) {
         const SUCCESS = true;
         const FAIL = false;
-        console.log("Received fungi code: " + code);
-        const staticRuleSystem = this.ruleParser.parse(code);
+        console.log("Received fungi code: " + staticRuleSystem);
         this.fungiState.setRuleSystem(staticRuleSystem);
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
