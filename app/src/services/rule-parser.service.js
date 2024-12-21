@@ -112,4 +112,31 @@ export class RuleParserService {
             return false;
         }
     }
+
+    toRawString(ruleSystem) {
+        const rules = ruleSystem.getRules();
+
+        const serializedRules = rules.map(rule => {
+            const parts = [`RULE:${rule.trigger}`];
+
+            if (rule.response) {
+                parts.push(`RESPONSE:${rule.response}`);
+            }
+
+            if (rule.condition) {
+                parts.push(`CONDITION:${rule.condition}`);
+            }
+
+            if (rule.template) {
+                const templateParts = Object.entries(rule.template)
+                    .map(([key, value]) => `${key}=${value}`)
+                    .join(",");
+                parts.push(`TEMPLATE:${templateParts}`);
+            }
+
+            return parts.join("|");
+        });
+
+        return `${this.programStart}|${serializedRules.join("|RULE:")}|${this.programEnd}`;
+    }
 }
