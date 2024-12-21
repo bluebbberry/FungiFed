@@ -1,177 +1,146 @@
-import {FungiParser} from "./fungi-parser.service.js";
-import masto from "../configs/mastodonclient.js";
+import { RuleParserService } from "./rule-parser.service.js";
 import * as cron from "node-cron";
-import {send, sendReply} from "./post.util.service.js";
-import {getMentionsNotifications} from "./notifications.service.js";
-import {decode} from 'html-entities';
+import { cronToHumanReadable, send, sendReply } from "./post.util.service.js";
+import { getMentionsNotifications } from "./notifications.service.js";
+import { decode } from 'html-entities';
+import { FungiState } from "../model/FungiState.js";
+import * as Config from "../configs/config.js";
+import {FungiHistoryService} from "./fungi-history.service.js";
+import {EvolutionaryAlgorithm} from "./evolutionary-algorithm.service.js";
+import {MycelialFungiHistoryService} from "./mycelial-fungi-history.service.js";
+import {FungiStateFitnessService} from "./fungi-state-fitness.service.js";
+import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
+import {StaticRule} from "../model/StaticRule.js";
 
 /**
- * A fungi has the following five life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
+ * A fungi has the following four life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
  *
- * 1. INITIAL SEARCH: Search under seed hashtag for FUNGI code (FUNGI is a custom DSL) - if success: procee, if not: sleep and try again.
- * 2. NEW CODE EXECUTION: The code is executed and feedback from user interactions is collected
- * 3. CALCULATE CODE HEALTH: After a while, the results are evaluated and a code health number is calculated
- * 4. SCRAPE & SHARE CODE HEALTH: The result with the related code is posted under the nutrition hashtag for other bots to process; at the same time, new code, potentially with evaulation results is scraped from the hashtag (of course, this may also come from human users).
- * 5. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 3, this time with the picked code
+ * 1. INITIAL SEARCH: Search under seed hashtag for FUNGI code (FUNGI is a custom DSL) - if success: proceed, if not: sleep and try again.
+ * 2. SHARE CODE HEALTH: The result with the related code is posted under the nutrition hashtag for other bots to process; at the same time, new code, potentially with evaulation results is scraped from the hashtag (of course, this may also come from human users).
+ * 3. NEW CODE EXECUTION: The code is executed and feedback from user interactions is collected
+ * 4. CALCULATE MUTATION: Based on one's own results, one's code history and the results from the other bots, a mutation from the current code is calculated and the life cycle start again from 2, this time with the picked code
+ * IN PARALLEL: CALCULATE CODE HEALTH: Through collecting user feedback, the results are evaluated and a code fitness number is calculated
+ * IN PARALLEL: Aggregate feedback from other fungi through mycelial hashtag and include it in mutation
  */
-export function startFungiLifecycle() {
-    runInitialSearch().then(() => {
-        runFungiLifecycle().then(() => {
-            const cronSchedule = '2 * * * *';
-            cron.schedule(cronSchedule, () => {
-                runFungiLifecycle();
+export class FungiService {
+    static fungiService = new FungiService();
+
+    constructor() {
+        this.fungiState = new FungiState(null, 0);
+        // Example input that is used in case nothing is found
+        this.defaultRuleSystem = new StaticRuleSystem([
+            new StaticRule("Hello", "Hello, Fediverse user!")
+        ]);
+        this.ruleParser = RuleParserService.parser;
+    }
+
+    startFungiLifecycle() {
+        this.runInitialSearch().then(() => {
+            this.startAnsweringMentions();
+            this.runFungiLifecycle().then(() => {
+                const cronSchedule = '2 * * * *';
+                cron.schedule(cronSchedule, () => {
+                    this.runFungiLifecycle();
+                });
+                console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
             });
-            console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
         });
-    });
-}
-
-export function startAnsweringMentions() {
-    const answerSchedule = '*/5 * * * *';
-    cron.schedule(answerSchedule, () => {
-        checkForMentionsAndLetFungiAnswer();
-    });
-    console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
-}
-
-let fungiCode;
-let fungiCommands;
-let codeHealth = 0;
-
-// Example input that is used in case nothing is found
-const exampleCode = `
-FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
-`;
-
-async function runInitialSearch() {
-    // 1. initial search
-    console.log("runInitialSearch");
-    const status = await getStatusWithValidFUNGICodeFromFungiTag();
-    if (status) {
-        fungiCode = decode(status.content);
     }
-    else {
-        fungiCode = exampleCode;
+
+    async runInitialSearch() {
+        // 0. Initial search
+        console.log("\n=== === === LIFECYCLE PHASE 0 - INITIAL SEARCH === === ===");
+        const status = await MycelialFungiHistoryService.mycelialFungiHistoryService.getStatusWithValidFUNGICodeFromFungiTag();
+        if (status) {
+            // 1. New State: set found rule system as new state
+            console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE === === ===");
+            console.log("Set rule system found on hashtag '" + Config.MYCELIAL_HASHTAG + "'");
+            const ruleSystem = RuleParserService.parser.parse(decode(status.content));
+            this.fungiState.setRuleSystem(ruleSystem);
+        }
+        else {
+            // 1. New State: set default rule system as new state
+            console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE === === ===");
+            console.log("Set default rule system");
+            this.fungiState.setRuleSystem(this.defaultRuleSystem);
+        }
+        let fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        fungiHistory.getFungiStates().push(this.fungiState);
     }
-}
 
-async function runFungiLifecycle() {
-    console.log("runFungiLifecycle");
+    startAnsweringMentions() {
+        const answerSchedule = '*/3 * * * *';
+        cron.schedule(answerSchedule, () => {
+            // 2. Answer Questions by users
+            console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
+            this.checkForMentionsAndLetFungiAnswer();
+        });
+        console.log("Scheduled fungi answering " + cronToHumanReadable(answerSchedule));
+    }
 
-    // 2. new code execution
-    parseAndSetCommandsFromFungiCode(fungiCode);
+    async runFungiLifecycle() {
+        // 3. Calculate fitness of current state based on user feedback
+        console.log("\n=== === === LIFECYCLE PHASE 3 - CALCULATE FITNESS BASED ON FEEDBACK === === ===");
+        FungiStateFitnessService.fungiStateFitnessService.calculateFitnessForFungiState(this.fungiState);
 
-    // 3. calculate code health
-    // TODO
+        // 4. Share code health
+        console.log("\n=== === === LIFECYCLE PHASE 4 - SHARE OWN FITNESS WITH OTHER FUNGI === === ===");
+        const rawCode = this.ruleParser.toRawString(this.fungiState.getRuleSystem());
+        this.shareStateUnderFungiTag(rawCode + " Fitness: " + this.fungiState.getFitness());
 
-    // 4. scrape and share code health
-    postStatusUnderFungiTag(fungiCode + " CodeHealth: " + codeHealth);
+        // 5. Calculate mutation
+        console.log("\n=== === === LIFECYCLE PHASE 5 - CALCULATE MUTATION OF CURRENT STATE === === ===");
+        const evolvedRuleSystem = this.mutateRuleSystem();
+        console.log("Current state: " + RuleParserService.parser.toRawString(this.fungiState.getRuleSystem()));
+        console.log("Mutation:      " + RuleParserService.parser.toRawString(evolvedRuleSystem));
 
-    // 5. calculate mutation
-    fungiCode = getStatusWithValidFUNGICodeFromFungiTag(fungiCode);
-}
+        // 1. New State: set mutate rule system as new state
+        console.log("\n=== === === LIFECYCLE PHASE 1 - SET NEW STATE=== === ===");
+        this.fungiState = new FungiState(evolvedRuleSystem, 0);
+        const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        fungiHistory.getFungiStates().push(this.fungiState);
+        this.setCommandsFromFungiCode(evolvedRuleSystem);
+    }
 
-const fungiParser = new FungiParser();
+    mutateRuleSystem() {
+        const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
+        const mycelialFungiHistory = MycelialFungiHistoryService.mycelialFungiHistoryService.getMycelialFungiHistory();
+        const evolvedRuleSystem = EvolutionaryAlgorithm.evolutionaryAlgorithm.evolve(
+            fungiHistory,
+            mycelialFungiHistory,
+            this.fungiState.getRuleSystem());
+        return evolvedRuleSystem;
+    }
 
-export function parseAndSetCommandsFromFungiCode(code) {
-    const SUCCESS = true;
-    const FAIL = false;
-    console.log("Received fungi code: " + code);
-    const tokens = fungiParser.tokenize(code);
-    fungiCommands = fungiParser.parse(tokens);
-    console.log("Sucessfully parsed and set as commands");
-    return SUCCESS;
-}
+    /**
+     * @param {StaticRuleSystem} staticRuleSystem
+     * @returns {boolean}
+     */
+    setCommandsFromFungiCode(staticRuleSystem) {
+        const SUCCESS = true;
+        const FAIL = false;
+        console.log("Received fungi code: " + this.ruleParser.toRawString(staticRuleSystem));
+        this.fungiState.setRuleSystem(staticRuleSystem);
+        console.log("Sucessfully parsed and set as commands");
+        return SUCCESS;
+    }
 
-export async function getStatusesFromFungiTag() {
-    const statuses = await masto.v1.timelines.tag.$select("fungi").list({
-        limit: 30,
-    });
-    return statuses;
-}
+    shareStateUnderFungiTag(message) {
+        send(message + " #" + Config.MYCELIAL_HASHTAG);
+    }
 
-export function postStatusUnderFungiTag(message) {
-    send(message + "#fungi");
-}
-
-export async function getStatusWithValidFUNGICodeFromFungiTag() {
-    const statuses = await getStatusesFromFungiTag();
-    for (let i = 0; i < statuses.length; i++) {
-        const status = statuses[i];
-        const decodedStatusContent = decode(status.content);
-        if (fungiParser.containsValidFUNGI(decodedStatusContent)) {
-            console.log("found status with FUNGI code");
-            return status;
+    async checkForMentionsAndLetFungiAnswer() {
+        const mentions = await getMentionsNotifications();
+        for (const mention of mentions) {
+            const answer = await this.generateAnswerToText(decode(mention.status.content));
+            await sendReply(answer, mention.status);
         }
     }
-}
 
-async function checkForMentionsAndLetFungiAnswer() {
-    const mentions = await getMentionsNotifications();
-    for (const mention of mentions) {
-        const answer = await generateAnswerToText(mention.status.content);
-        await sendReply(answer, mention.status);
+    async generateAnswerToText(content) {
+        console.log("generateAnswerToStatus with content", content);
+        const fungiResult = this.ruleParser.calculateResponse(this.fungiState.getRuleSystem(), content);
+        console.log("Response: '" + fungiResult + "'");
+        return fungiResult;
     }
-}
-
-export async function generateAnswerToText(content) {
-    console.log("generateAnswerToStatus with content", content);
-    const fungiResult = fungiParser.execute(fungiCommands, content);
-    console.log("Response: '" + fungiResult + "'");
-    return fungiResult;
-}
-
-/**
- * Converts a cron schedule expression into a human-readable string.
- * @param {string} cronExpression - The cron expression to convert.
- * @returns {string} - A human-readable description of the cron schedule.
- */
-function cronToHumanReadable(cronExpression) {
-    // Validate the cron expression
-    if (!cron.validate(cronExpression)) {
-        throw new Error("Invalid cron expression.");
-    }
-
-    // Split the cron expression into parts
-    const [minute, hour, dayOfMonth, month, dayOfWeek] = cronExpression.split(' ');
-
-    const humanReadableParts = [];
-
-    // Process each part of the cron expression
-    if (minute === '*') {
-        humanReadableParts.push("every minute");
-    } else {
-        humanReadableParts.push(`at minute ${minute}`);
-    }
-
-    if (hour === '*') {
-        humanReadableParts.push("every hour");
-    } else {
-        humanReadableParts.push(`at hour ${hour}`);
-    }
-
-    if (dayOfMonth === '*') {
-        humanReadableParts.push("every day");
-    } else {
-        humanReadableParts.push(`on day ${dayOfMonth} of the month`);
-    }
-
-    if (month === '*') {
-        humanReadableParts.push("every month");
-    } else {
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const monthList = month.split(',').map(m => months[parseInt(m, 10) - 1]);
-        humanReadableParts.push(`in ${monthList.join(', ')}`);
-    }
-
-    if (dayOfWeek === '*') {
-        humanReadableParts.push("on every weekday");
-    } else {
-        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const dayList = dayOfWeek.split(',').map(d => days[parseInt(d, 10)]);
-        humanReadableParts.push(`on ${dayList.join(', ')}`);
-    }
-
-    // Join all the human-readable parts into a single string
-    return humanReadableParts.join(' ');
 }

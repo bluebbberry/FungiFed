@@ -2,8 +2,11 @@ import express from 'express';
 import cors from "cors";
 import userController from "./src/controllers/user.controller.js";
 import fungiController from "./src/controllers/fungi.controller.js";
-import {startAnsweringMentions, startFungiLifecycle} from "./src/services/fungi.service.js";
+import { FungiService } from "./src/services/fungi.service.js";
 import notificationsController from "./src/controllers/notifications.controller.js";
+import {FungiHistoryService} from "./src/services/fungi-history.service.js";
+import {MycelialFungiHistoryService} from "./src/services/mycelial-fungi-history.service.js";
+import statusController from "./src/controllers/status.controller.js";
 
 // ============== REST API ===================
 const app = express();
@@ -17,6 +20,7 @@ app.use(cors({
 app.use('/user', userController);
 app.use('/fungi', fungiController);
 app.use('/notifications', notificationsController);
+app.use('/statuses', statusController);
 
 const PORT = 3000;
 
@@ -24,5 +28,11 @@ app.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
 });
 
-startFungiLifecycle();
-startAnsweringMentions();
+const fungiService = FungiService.fungiService;
+fungiService.startFungiLifecycle();
+
+const fungiHistoryService = FungiHistoryService.fungiHistoryService;
+fungiHistoryService.startUpdatingUserFeedback();
+
+const mycelialHistoryService = MycelialFungiHistoryService.mycelialFungiHistoryService;
+mycelialHistoryService.startAggregatingMycelialData();
