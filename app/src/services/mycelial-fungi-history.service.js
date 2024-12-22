@@ -29,14 +29,26 @@ export class MycelialFungiHistoryService {
         console.log("Scraped " + statuses.length + " tag posts for mycerial history");
         let fungiStates = this.mycelialFungiHistory.getFungiStates();
         statuses.forEach((status) => {
-            fungiStates.push(new FungiState(status, this.parseFitnessFromStatus(status)));
+            fungiStates.push(new FungiState(status, this.parseFitnessFromStatus(status.content)));
         });
         this.mycelialFungiHistory.setFungiStates(fungiStates);
     }
 
-    parseFitnessFromStatus(status) {
-        status.content;
-        return 0;
+    /**
+     * Extracts the fitness value from a given post string.
+     *
+     * @param {string} content - The post containing the fitness value.
+     * @returns {number} - The extracted fitness value.
+     * @throws {Error} - If no fitness value is found in the post.
+     */
+    parseFitnessFromStatus(content) {
+        const pattern = /Fitness:\s*([0-9]*\.?[0-9]+)/;
+        const match = content.match(pattern);
+        if (match) {
+            return parseFloat(match[1]);
+        } else {
+            throw new Error("No fitness value found in the post.");
+        }
     }
 
     getMycelialFungiHistory() {
