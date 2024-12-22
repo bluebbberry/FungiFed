@@ -6,6 +6,7 @@ import * as Config from "../configs/config.js";
 import {decode} from "html-entities";
 import {FungiState} from "../model/FungiState.js";
 import {RuleParserService} from "./rule-parser.service.js";
+import {StatusesService} from "./statuses.service.js";
 
 export class MycelialFungiHistoryService {
     static mycelialFungiHistoryService = new MycelialFungiHistoryService();
@@ -54,15 +55,8 @@ export class MycelialFungiHistoryService {
         return this.mycelialFungiHistory;
     }
 
-    async getStatusesFromFungiTag() {
-        const statuses = await masto.v1.timelines.tag.$select(Config.MYCELIAL_HASHTAG).list({
-            limit: 40,
-        });
-        return statuses;
-    }
-
     async getStatusWithValidFUNGICodeFromFungiTag() {
-        const statuses = await this.getStatusesFromFungiTag();
+        const statuses = await StatusesService.statusesService.getStatusesFromTag(Config.MYCELIAL_HASHTAG, 40);
         for (let i = 0; i < statuses.length; i++) {
             const status = statuses[i];
             const decodedStatusContent = decode(status.content);
@@ -75,7 +69,7 @@ export class MycelialFungiHistoryService {
 
     async getAllStatusesWithValidFUNGICodeFromFungiTag() {
         const result = [];
-        const statuses = await this.getStatusesFromFungiTag();
+        const statuses = await StatusesService.statusesService.getStatusesFromTag(Config.MYCELIAL_HASHTAG, 40);
         for (let i = 0; i < statuses.length; i++) {
             const status = statuses[i];
             const decodedStatusContent = decode(status.content);

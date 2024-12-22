@@ -93,11 +93,15 @@ export class RuleParserService {
     calculateResponse(staticRuleSystem, input) {
         let response = 'Sorry, no match';
         staticRuleSystem.getRules().forEach(staticRule => {
-            if (input.toLowerCase().includes(staticRule.trigger.toLowerCase())) {
+            if (this.doesTriggerRule(input, staticRule)) {
                 response = staticRule.response;
             }
         });
         return response;
+    }
+
+    doesTriggerRule(text, staticRule) {
+        return text.toLowerCase().includes(staticRule.trigger.toLowerCase());
     }
 
     containsValidFUNGI(content) {
@@ -138,5 +142,15 @@ export class RuleParserService {
         });
 
         return `${this.programStart}|${serializedRules.join("|")}|${this.programEnd}`;
+    }
+
+    /**
+     *
+     * @param {StaticRuleSystem} ruleSystem
+     * @param {string} statusContent
+     * @returns {boolean}
+     */
+    isAbleToReactTo(ruleSystem, statusContent) {
+        return ruleSystem.getRules().some(rule => this.doesTriggerRule(statusContent, rule));
     }
 }
