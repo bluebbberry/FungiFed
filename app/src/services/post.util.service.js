@@ -33,42 +33,82 @@ function cronToHumanReadable(cronExpression) {
     const humanReadableParts = [];
 
     // Process each part of the cron expression
-    if (minute === '*') {
-        humanReadableParts.push("every minute");
-    } else {
-        humanReadableParts.push(`at minute ${minute}`);
-    }
-
-    if (hour === '*') {
-        humanReadableParts.push("every hour");
-    } else {
-        humanReadableParts.push(`at hour ${hour}`);
-    }
-
-    if (dayOfMonth === '*') {
-        humanReadableParts.push("every day");
-    } else {
-        humanReadableParts.push(`on day ${dayOfMonth} of the month`);
-    }
-
-    if (month === '*') {
-        humanReadableParts.push("every month");
-    } else {
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const monthList = month.split(',').map(m => months[parseInt(m, 10) - 1]);
-        humanReadableParts.push(`in ${monthList.join(', ')}`);
-    }
-
-    if (dayOfWeek === '*') {
-        humanReadableParts.push("on every weekday");
-    } else {
-        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const dayList = dayOfWeek.split(',').map(d => days[parseInt(d, 10)]);
-        humanReadableParts.push(`on ${dayList.join(', ')}`);
-    }
+    humanReadableParts.push(parseMinute(minute));
+    humanReadableParts.push(parseHour(hour));
+    humanReadableParts.push(parseDayOfMonth(dayOfMonth));
+    humanReadableParts.push(parseMonth(month));
+    humanReadableParts.push(parseDayOfWeek(dayOfWeek));
 
     // Join all the human-readable parts into a single string
     return humanReadableParts.join(' ');
+}
+
+function parsePart(part, unit, names) {
+    if (part === '*') {
+        return `every ${unit}`;
+    } else if (part.includes('/')) {
+        return parseStep(part, unit);
+    } else if (part.includes('-')) {
+        return parseRange(part, unit);
+    } else if (part.includes(',')) {
+        return parseList(part, unit, names);
+    } else {
+        return parseSingleValue(part, unit, names);
+    }
+}
+
+function parseStep(part, unit) {
+    const [range, step] = part.split('/');
+    if (range === '*') {
+        return `every ${step} ${unit}`;
+    } else {
+        const [start, end] = range.split('-');
+        return `every ${step} ${unit} from ${start} to ${end}`;
+    }
+}
+
+function parseRange(part, unit) {
+    const [start, end] = part.split('-');
+    return `from ${start} to ${end} ${unit}`;
+}
+
+function parseList(part, unit, names) {
+    const list = part.split(',');
+    if (names) {
+        return `on ${list.map(val => names[parseInt(val, 10)]).join(', ')}`;
+    } else {
+        return `at ${list.join(', ')} ${unit}`;
+    }
+}
+
+function parseSingleValue(part, unit, names) {
+    if (names) {
+        return `on ${names[parseInt(part, 10)]}`;
+    } else {
+        return `at ${unit} ${part}`;
+    }
+}
+
+function parseMinute(minute) {
+    return parsePart(minute, 'minute');
+}
+
+function parseHour(hour) {
+    return parsePart(hour, 'hour');
+}
+
+function parseDayOfMonth(dayOfMonth) {
+    return parsePart(dayOfMonth, 'day');
+}
+
+function parseMonth(month) {
+    const monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return parsePart(month, 'month', monthNames);
+}
+
+function parseDayOfWeek(dayOfWeek) {
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return parsePart(dayOfWeek, 'weekday', dayNames);
 }
 
 export { send, sendReply, cronToHumanReadable };

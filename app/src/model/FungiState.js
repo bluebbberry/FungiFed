@@ -1,4 +1,9 @@
 export class FungiState {
+    /**
+     *
+     * @param {StaticRuleSystem} ruleSystem
+     * @param {number} fitness
+     */
     constructor(ruleSystem, fitness = 0) {
         this.ruleSystem = ruleSystem;
         this.fitness = fitness;
