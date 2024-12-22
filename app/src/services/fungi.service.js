@@ -124,7 +124,7 @@ export class FungiService {
         const SUCCESS = true;
         const FAIL = false;
         this.fungiState.setRuleSystem(staticRuleSystem);
-        console.log("Sucessfully parsed and set as commands");
+        console.log("Successfully parsed and set new rule");
         return SUCCESS;
     }
 
