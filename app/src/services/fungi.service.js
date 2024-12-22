@@ -35,9 +35,9 @@ export class FungiService {
         this.ruleParser = RuleParserService.parser;
     }
 
-    startFungiLifecycle() {
+    startFungiLifecycle(answeringSchedule) {
         this.runInitialSearch().then(async () => {
-            this.startAnsweringMentions();
+            this.startAnsweringMentions(answeringSchedule);
             await MycelialFungiHistoryService.mycelialFungiHistoryService.fetchNewEntriesFromMycelialHashtag();
             this.runFungiLifecycle().then(() => {
                 const cronSchedule = Config.LIFECYCLE_TRIGGER_SCHEDULE;
@@ -70,8 +70,7 @@ export class FungiService {
         fungiHistory.getFungiStates().push(this.fungiState);
     }
 
-    startAnsweringMentions() {
-        const answerSchedule = Config.USER_ANSWERING_SCHEDULE;
+    startAnsweringMentions(answerSchedule) {
         this.checkForMentionsAndLetFungiAnswer();
         cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users

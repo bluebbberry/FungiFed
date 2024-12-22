@@ -7,6 +7,7 @@ import notificationsController from "./src/controllers/notifications.controller.
 import {FungiHistoryService} from "./src/services/fungi-history.service.js";
 import {MycelialFungiHistoryService} from "./src/services/mycelial-fungi-history.service.js";
 import statusController from "./src/controllers/status.controller.js";
+import * as Config from "./src/configs/config.js";
 
 // ============== REST API ===================
 const app = express();
@@ -29,7 +30,7 @@ app.listen(PORT, () => {
 });
 
 const fungiService = FungiService.fungiService;
-fungiService.startFungiLifecycle();
+fungiService.startFungiLifecycle(Config.USER_ANSWERING_SCHEDULE);
 
 const fungiHistoryService = FungiHistoryService.fungiHistoryService;
 fungiHistoryService.startUpdatingUserFeedback();
