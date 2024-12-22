@@ -35,10 +35,11 @@ export class FungiService {
     }
 
     startFungiLifecycle() {
-        this.runInitialSearch().then(() => {
+        this.runInitialSearch().then(async () => {
             this.startAnsweringMentions();
+            await MycelialFungiHistoryService.mycelialFungiHistoryService.fetchNewEntriesFromMycelialHashtag();
             this.runFungiLifecycle().then(() => {
-                const cronSchedule = '2 * * * *';
+                const cronSchedule = Config.LIFECYCLE_TRIGGER_SCHEDULE;
                 cron.schedule(cronSchedule, () => {
                     this.runFungiLifecycle();
                 });
@@ -69,7 +70,7 @@ export class FungiService {
     }
 
     startAnsweringMentions() {
-        const answerSchedule = '*/3 * * * *';
+        const answerSchedule = Config.USER_ANSWERING_SCHEDULE;
         cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users
             console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
@@ -105,6 +106,8 @@ export class FungiService {
     mutateRuleSystem() {
         const fungiHistory = FungiHistoryService.fungiHistoryService.getFungiHistory();
         const mycelialFungiHistory = MycelialFungiHistoryService.mycelialFungiHistoryService.getMycelialFungiHistory();
+        console.log("fungiHistory: " + fungiHistory.getFungiStates().length + " entries");
+        console.log("mycelial fungiHistory: " + mycelialFungiHistory.getFungiStates().length + " entries");
         const evolvedRuleSystem = EvolutionaryAlgorithm.evolutionaryAlgorithm.evolve(
             fungiHistory,
             mycelialFungiHistory,

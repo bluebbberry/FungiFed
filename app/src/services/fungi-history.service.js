@@ -2,6 +2,7 @@ import {FungiHistory} from "../model/FungiHistory.js";
 import {StatusesService} from "./statuses.service.js";
 import * as cron from "node-cron";
 import {cronToHumanReadable} from "./post.util.service.js";
+import * as Config from "../configs/config.js";
 
 export class FungiHistoryService {
     static fungiHistoryService = new FungiHistoryService();
@@ -11,7 +12,7 @@ export class FungiHistoryService {
     }
 
     startUpdatingUserFeedback() {
-        const checkForFeedbackSchedule = '*/2 * * * *';
+        const checkForFeedbackSchedule = Config.FETCH_USER_FEEDBACK_SCHEDULE;
         cron.schedule(checkForFeedbackSchedule, () => {
             this.updateFungiHistoryBasedOnUserFeedback();
         });

@@ -54,12 +54,17 @@ From now on, in the `/app`-folder, run:
 
 3. **Configure Your Host**:
     - Create a `.env` file to define your environment variables.
-    - Example configuration:
+    - Schema of configuration:
       ```env
       MASTODON_API_KEY=your-api-key
       ACCOUNT_NAME=your-account-name
       URL=url-to-my-instance
       MYCELIAL_HASHTAG=hashtag that fungi communicate over
+      
+      MYCELIAL_FETCH_SCHEDULE="*/10 */2 * * *" #schedule to fetch posts from other fungi
+      USER_ANSWERING_SCHEDULE="*/3 * * * *" #schedule to answer requests from users
+      LIFECYCLE_TRIGGER_SCHEDULE="*/2 */2 * * *" #schedule to trigger fungi lifecycle
+      FETCH_USER_FEEDBACK_SCHEDULE="*/2 */3 * * *" #schedule to fetch user feedback from send out replies
       ```
 
 4. **Start the Fungi Host**:
