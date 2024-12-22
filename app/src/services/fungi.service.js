@@ -123,7 +123,6 @@ export class FungiService {
     setCommandsFromFungiCode(staticRuleSystem) {
         const SUCCESS = true;
         const FAIL = false;
-        console.log("Received fungi code: " + this.ruleParser.toRawString(staticRuleSystem));
         this.fungiState.setRuleSystem(staticRuleSystem);
         console.log("Sucessfully parsed and set as commands");
         return SUCCESS;
