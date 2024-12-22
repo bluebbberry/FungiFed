@@ -17,7 +17,7 @@ export class MycelialFungiHistoryService {
     }
 
     startAggregatingMycelialData() {
-        const checkForMycelialDataSchedule = '28 */2 * * *';
+        const checkForMycelialDataSchedule = Config.MYCELIAL_FETCH_SCHEDULE;
         cron.schedule(checkForMycelialDataSchedule, () => {
             this.fetchNewEntriesFromMycelialHashtag();
         });

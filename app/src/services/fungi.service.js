@@ -39,7 +39,7 @@ export class FungiService {
             this.startAnsweringMentions();
             await MycelialFungiHistoryService.mycelialFungiHistoryService.fetchNewEntriesFromMycelialHashtag();
             this.runFungiLifecycle().then(() => {
-                const cronSchedule = '2 * * * *';
+                const cronSchedule = Config.LIFECYCLE_TRIGGER_SCHEDULE;
                 cron.schedule(cronSchedule, () => {
                     this.runFungiLifecycle();
                 });
@@ -70,7 +70,7 @@ export class FungiService {
     }
 
     startAnsweringMentions() {
-        const answerSchedule = '*/3 * * * *';
+        const answerSchedule = Config.USER_ANSWERING_SCHEDULE;
         cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users
             console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
