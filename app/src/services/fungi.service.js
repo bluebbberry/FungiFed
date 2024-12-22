@@ -72,6 +72,7 @@ export class FungiService {
 
     startAnsweringMentions() {
         const answerSchedule = Config.USER_ANSWERING_SCHEDULE;
+        this.checkForMentionsAndLetFungiAnswer();
         cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users
             console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
@@ -141,7 +142,7 @@ export class FungiService {
         }
 
         // check for requests under hashtag
-        const postStatuses = await StatusesService.statusesService.getStatusesFromTag(Config.NUTRIOUS_HASHTAG, 40);
+        const postStatuses = await StatusesService.statusesService.getStatusesFromTag(Config.NUTRITIOUS_HASHTAG, 40);
         for (const status of postStatuses) {
             if (RuleParserService.parser.isAbleToReactTo(this.fungiState.getRuleSystem(), decode(status.content))) {
                 const answer = this.generateAnswerToText(decode(status.content));
