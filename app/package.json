@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "mocha-test": "npx mocha --reporter spec test/**"
+    "test": "npx mocha --reporter spec test/**",
+    "mocha-test": "npx mocha --reporter spec test/**",
+    "coverage-test": "nyc --all npm run test"
   },
   "keywords": [],
   "author": "",
