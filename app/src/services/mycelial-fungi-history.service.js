@@ -1,5 +1,3 @@
-import {FungiHistory} from "../model/FungiHistory.js";
-import {StatusesService} from "./statuses.service.js";
 import * as cron from "node-cron";
 import {cronToHumanReadable} from "./post.util.service.js";
 import {MycelialFungiHistory} from "../model/MycelialFungiHistory.js";
@@ -25,11 +23,12 @@ export class MycelialFungiHistoryService {
     }
 
     async fetchNewEntriesFromMycelialHashtag() {
-        const statuses = await this.getStatusesFromFungiTag();
-        console.log("Scraped " + statuses.length + " tag posts for mycerial history");
+        const validStatuses = await this.getAllStatusesWithValidFUNGICodeFromFungiTag();
+        console.log("Scraped " + validStatuses.length + " tag posts for mycerial history");
         let fungiStates = this.mycelialFungiHistory.getFungiStates();
-        statuses.forEach((status) => {
-            fungiStates.push(new FungiState(status, this.parseFitnessFromStatus(status.content)));
+        validStatuses.forEach((status) => {
+            const staticRuleSystem = RuleParserService.parser.parse(decode(status.content));
+            fungiStates.push(new FungiState(staticRuleSystem, this.parseFitnessFromStatus(status.content)));
         });
         this.mycelialFungiHistory.setFungiStates(fungiStates);
     }
@@ -72,5 +71,18 @@ export class MycelialFungiHistoryService {
                 return status;
             }
         }
+    }
+
+    async getAllStatusesWithValidFUNGICodeFromFungiTag() {
+        const result = [];
+        const statuses = await this.getStatusesFromFungiTag();
+        for (let i = 0; i < statuses.length; i++) {
+            const status = statuses[i];
+            const decodedStatusContent = decode(status.content);
+            if (RuleParserService.parser.containsValidFUNGI(decodedStatusContent)) {
+                result.push(status);
+            }
+        }
+        return result;
     }
 }
