@@ -11,6 +11,7 @@ import {MycelialFungiHistoryService} from "./mycelial-fungi-history.service.js";
 import {FungiStateFitnessService} from "./fungi-state-fitness.service.js";
 import {StaticRuleSystem} from "../model/StaticRuleSystem.js";
 import {StaticRule} from "../model/StaticRule.js";
+import {StatusesService} from "./statuses.service.js";
 
 /**
  * A fungi has the following four life cycle (based on https://github.com/bluebbberry/FediFungiHost/wiki/A-Fungi's-Lifecycle):
@@ -71,6 +72,7 @@ export class FungiService {
 
     startAnsweringMentions() {
         const answerSchedule = Config.USER_ANSWERING_SCHEDULE;
+        this.checkForMentionsAndLetFungiAnswer();
         cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users
             console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
@@ -122,9 +124,8 @@ export class FungiService {
     setCommandsFromFungiCode(staticRuleSystem) {
         const SUCCESS = true;
         const FAIL = false;
-        console.log("Received fungi code: " + this.ruleParser.toRawString(staticRuleSystem));
         this.fungiState.setRuleSystem(staticRuleSystem);
-        console.log("Sucessfully parsed and set as commands");
+        console.log("Successfully parsed and set new rule");
         return SUCCESS;
     }
 
@@ -133,14 +134,24 @@ export class FungiService {
     }
 
     async checkForMentionsAndLetFungiAnswer() {
+        // check for mentions to account
         const mentions = await getMentionsNotifications();
         for (const mention of mentions) {
-            const answer = await this.generateAnswerToText(decode(mention.status.content));
+            const answer = this.generateAnswerToText(decode(mention.status.content));
             await sendReply(answer, mention.status);
+        }
+
+        // check for requests under hashtag
+        const postStatuses = await StatusesService.statusesService.getStatusesFromTag(Config.NUTRITIOUS_HASHTAG, 40);
+        for (const status of postStatuses) {
+            if (RuleParserService.parser.isAbleToReactTo(this.fungiState.getRuleSystem(), decode(status.content))) {
+                const answer = this.generateAnswerToText(decode(status.content));
+                await sendReply(answer, status);
+            }
         }
     }
 
-    async generateAnswerToText(content) {
+    generateAnswerToText(content) {
         console.log("generateAnswerToStatus with content", content);
         const fungiResult = this.ruleParser.calculateResponse(this.fungiState.getRuleSystem(), content);
         console.log("Response: '" + fungiResult + "'");
