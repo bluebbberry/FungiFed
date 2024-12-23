@@ -26,7 +26,8 @@ import {StatusesService} from "./statuses.service.js";
 export class FungiService {
     static fungiService = new FungiService();
 
-    constructor() {
+    constructor(cronTemp = cron) {
+        this.cron = cronTemp;
         this.fungiState = new FungiState(null, 0);
         // Example input that is used in case nothing is found
         this.defaultRuleSystem = new StaticRuleSystem([
@@ -41,7 +42,7 @@ export class FungiService {
             await MycelialFungiHistoryService.mycelialFungiHistoryService.fetchNewEntriesFromMycelialHashtag();
             this.runFungiLifecycle().then(() => {
                 const cronSchedule = Config.LIFECYCLE_TRIGGER_SCHEDULE;
-                cron.schedule(cronSchedule, () => {
+                this.cron.schedule(cronSchedule, () => {
                     this.runFungiLifecycle();
                 });
                 console.log("Scheduled fungi lifecycle " + cronToHumanReadable(cronSchedule));
@@ -72,7 +73,7 @@ export class FungiService {
 
     startAnsweringMentions(answerSchedule) {
         this.checkForMentionsAndLetFungiAnswer();
-        cron.schedule(answerSchedule, () => {
+        this.cron.schedule(answerSchedule, () => {
             // 2. Answer Questions by users
             console.log("\n=== === === LIFECYCLE PHASE 2 - ANSWERING QUESTIONS BY USERS === === ===");
             this.checkForMentionsAndLetFungiAnswer();

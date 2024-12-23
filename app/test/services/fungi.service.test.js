@@ -28,9 +28,13 @@ describe('Test parser', function(){
 
 describe("FungiService", () => {
     let fungiService;
+    let cronStub;
 
     beforeEach(() => {
-        fungiService = new FungiService();
+        cronStub = sinon.stub(cron, "schedule").callsFake((schedule, callback) => {
+            // dont call the callback for now
+        });
+        fungiService = new FungiService(cronStub);
     });
 
     afterEach(() => {
@@ -61,13 +65,12 @@ describe("FungiService", () => {
 
     describe("startAnsweringMentions", () => {
         it("should schedule mention answering with the configured cron schedule", () => {
-            const cronStub = sinon.stub(cron, "schedule");
             const USER_ANSWERING_SCHEDULE = "*/5 * * * *"; // Example schedule
             //const configStub = sinon.stub(Config, "USER_ANSWERING_SCHEDULE").value("*/5 * * * *"); // Stub the config value
 
             fungiService.startAnsweringMentions(USER_ANSWERING_SCHEDULE);
 
-            expect(cronStub.calledWith(USER_ANSWERING_SCHEDULE, sinon.match.any)).to.be.true;
+            expect(cronStub.calledWith(USER_ANSWERING_SCHEDULE, sinon.match.func)).to.be.true;
         });
     });
 
