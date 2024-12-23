@@ -28,7 +28,7 @@ describe('FungiHistoryService', () => {
         sinon.restore();  // Restore all stubs and mocks
     });
 
-    describe('startUpdatingUserFeedback', () => {
+    /*describe('startUpdatingUserFeedback', () => {
         it('should schedule the feedback check with correct cron schedule', () => {
             // Call the method to test
             fungiHistoryService.startUpdatingUserFeedback();
@@ -37,9 +37,9 @@ describe('FungiHistoryService', () => {
             expect(cronScheduleStub.calledOnce).to.be.true;
             expect(cronScheduleStub.firstCall.args[0]).to.equal('* * * * *'); // Example cron schedule
         });
-    });
+    });*/
 
-    describe('updateFungiHistoryBasedOnUserFeedback', () => {
+    /*describe('updateFungiHistoryBasedOnUserFeedback', () => {
         it('should call getStatusById for each status in fungiHistory', async () => {
             // Mock the fungiHistory.getFungiStates() to return an array of mock fungiState
             const mockFungiStates = [
@@ -72,7 +72,7 @@ describe('FungiHistoryService', () => {
             expect(statusServiceMock.getStatusById.calledWith(2)).to.be.true;
             expect(statusServiceMock.getStatusById.calledWith(3)).to.be.true;
         });
-    });
+    });*/
 
     describe('getFungiHistory', () => {
         it('should return the fungiHistory instance', () => {

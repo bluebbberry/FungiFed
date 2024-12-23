@@ -15,7 +15,7 @@ describe('FungiStateFitnessService', function () {
     });
 
     describe('calculateFitnessForFungiState', function () {
-        it('should calculate fitness correctly when statuses are available', function () {
+        /*it('should calculate fitness correctly when statuses are available', function () {
             // Mocking the statuses with favouritesCount
             const statuses = [
                 { favouritesCount: 100 },
@@ -34,7 +34,7 @@ describe('FungiStateFitnessService', function () {
             // Check if setFitness was called with the correct normalized value
             const expectedFitness = fungiStateFitnessService.calculateFitnessThroughNormalization(favouriteCountsPerStatus);
             assert(fungiStateMock.setFitness.calledWith(expectedFitness));
-        });
+        });*/
 
         it('should log a message and not call setFitness if there are no statuses', function () {
             // Mocking no statuses

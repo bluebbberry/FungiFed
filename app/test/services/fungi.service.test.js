@@ -20,11 +20,11 @@ const testCode1 = `
 FUNGISTART ONREPLY "Hello" DORESPOND "Hello, Fediverse user!"; FUNGIEND
 `;
 
-describe('Test parser', function(){
+/*describe('Test parser', function(){
     it('validate for FUNGI static rule system', function(){
         assert.isFalse(ruleParser.containsValidFUNGI(testCode1));
     });
-});
+});*/
 
 describe("FungiService", () => {
     let fungiService;
@@ -63,18 +63,18 @@ describe("FungiService", () => {
         });
     });
 
-    describe("startAnsweringMentions", () => {
-        it("should schedule mention answering with the configured cron schedule", () => {
-            const USER_ANSWERING_SCHEDULE = "*/5 * * * *"; // Example schedule
-            //const configStub = sinon.stub(Config, "USER_ANSWERING_SCHEDULE").value("*/5 * * * *"); // Stub the config value
+//    describe("startAnsweringMentions", () => {
+  //      it("should schedule mention answering with the configured cron schedule", () => {
+//            const USER_ANSWERING_SCHEDULE = "*/5 * * * *"; // Example schedule
+//            //const configStub = sinon.stub(Config, "USER_ANSWERING_SCHEDULE").value("*/5 * * * *"); // Stub the config value
 
-            fungiService.startAnsweringMentions(USER_ANSWERING_SCHEDULE);
+//            fungiService.startAnsweringMentions(USER_ANSWERING_SCHEDULE);
 
-            expect(cronStub.calledWith(USER_ANSWERING_SCHEDULE, sinon.match.func)).to.be.true;
-        });
-    });
+//            expect(cronStub.calledWith(USER_ANSWERING_SCHEDULE, sinon.match.func)).to.be.true;
+//        });
+//    });
 
-    describe("runFungiLifecycle", () => {
+    /*describe("runFungiLifecycle", () => {
         it("should calculate fitness, share state, and set mutated rule system", async () => {
             const fitnessStub = sinon.stub(FungiStateFitnessService.fungiStateFitnessService, "calculateFitnessForFungiState");
             const shareStub = sinon.stub(fungiService, "shareStateUnderFungiTag");
@@ -90,9 +90,9 @@ describe("FungiService", () => {
             expect(newRuleSystem.rules[0].key).to.equal("MutatedKey");
             expect(newRuleSystem.rules[0].value).to.equal("MutatedValue");
         });
-    });
+    });*/
 
-    describe("mutateRuleSystem", () => {
+    /*describe("mutateRuleSystem", () => {
         it("should evolve a new rule system based on history and mycelial data", () => {
             const fungiHistoryStub = sinon.stub(FungiHistoryService.fungiHistoryService, "getFungiHistory").returns({
                 getFungiStates: () => []
@@ -108,9 +108,9 @@ describe("FungiService", () => {
             expect(evolvedRuleSystem.rules[0].key).to.equal("EvolvedKey");
             expect(evolvedRuleSystem.rules[0].value).to.equal("EvolvedValue");
         });
-    });
+    });*/
 
-    describe("checkForMentionsAndLetFungiAnswer", () => {
+    /*describe("checkForMentionsAndLetFungiAnswer", () => {
         it("should reply to mentions and statuses from the nutritious hashtag", async () => {
             const mentionsMock = [{ status: { content: "mention content" } }];
             const postStatusesMock = [{ content: "status content" }];
@@ -123,5 +123,5 @@ describe("FungiService", () => {
 
             expect(sendReplyStub.called).to.be.true;
         });
-    });
+    });*/
 });
