@@ -1,7 +1,7 @@
 // test/notifications.test.js
 import assert from "assert";
 import sinon from "sinon";
-import masto from "../../src/configs/mastodonclient.js";
+import {getMasto} from "../../src/configs/mastodonclient.js";
 import {getMentionsNotifications} from "../../src/services/notifications.service.js";  // Assuming masto is the real class path
 
 // Test suite
@@ -10,7 +10,7 @@ describe('getMentionsNotifications', function () {
 
     beforeEach(() => {
         // Create a stub of the masto class
-        mastoStub = sinon.stub(masto, 'v1').value({
+        mastoStub = sinon.stub(getMasto, 'v1').value({
             notifications: {
                 list: async () => {
                     // Mock notifications data
