@@ -1,15 +1,15 @@
-import masto from "../configs/mastodonclient.js";
+import { getMasto } from "../configs/mastodonclient.js";
 import * as cron from "node-cron";
 
 async function send(message) {
-    const status = await masto.v1.statuses.create({
+    const status = await getMasto().v1.statuses.create({
         status: message,
     });
     console.log(status.url);
 }
 
 async function sendReply(message, status) {
-    const s = await masto.v1.statuses.create({
+    const s = await getMasto().v1.statuses.create({
         status: message,
         inReplyToId: status.id,
     });

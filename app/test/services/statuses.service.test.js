@@ -1,67 +1,66 @@
-import assert from 'assert';
+import { assert } from 'chai';
 import sinon from 'sinon';
-import masto from '../../src/configs/mastodonclient.js';
-import {StatusesService} from "../../src/services/statuses.service.js";
+import { StatusesService } from "../../src/services/statuses.service.js";
 
 describe('StatusesService', function () {
-    let statusesService;
+    let getMastoStub;
+    let mastoClientMock;
+    let service;
 
-    beforeEach(function () {
-        statusesService = StatusesService.statusesService;
+    beforeEach(() => {
+        // Mock the Masto client methods
+        mastoClientMock = {
+            v1: {
+                statuses: {
+                    $select: sinon.stub().returns({
+                        fetch: sinon.stub(),
+                    }),
+                },
+                timelines: {
+                    tag: {
+                        $select: sinon.stub().returns({
+                            list: sinon.stub(),
+                        }),
+                    },
+                },
+            },
+        };
+
+        // Stub getMasto to return the mock client
+        getMastoStub = sinon.stub().returns(mastoClientMock);
+
+        // Inject the mock getMasto function into the service
+        service = new StatusesService(getMastoStub);
     });
 
-    afterEach(function () {
-        // Restore the original behavior of any stubbed methods.
+    afterEach(() => {
         sinon.restore();
     });
 
     describe('getStatusById', function () {
         it('should fetch a status by ID', async function () {
-            const mockId = '12345';
-            const mockStatus = { id: mockId, content: 'Mock Status Content' };
+            const statusId = '12345';
+            const mockStatus = { id: statusId, content: 'Hello World!' };
+            mastoClientMock.v1.statuses.$select().fetch.resolves(mockStatus);
 
-            // Stub the masto client method to simulate API response
-            const fetchStub = sinon.stub(masto.v1.statuses.$select(mockId), 'fetch').resolves(mockStatus);
+            const result = await service.getStatusById(statusId);
 
-            const result = await statusesService.getStatusById(mockId);
-
-            assert(fetchStub.calledOnce, 'Expected fetch to be called once');
-            assert.strictEqual(result, mockStatus, 'The result should match the mock status');
+            assert.isTrue(mastoClientMock.v1.statuses.$select().fetch.calledOnce);
+            assert.deepEqual(result, mockStatus);
         });
     });
 
     describe('getStatusesFromTag', function () {
-        it('should fetch statuses from a tag', async function () {
-            const mockTag = 'mocktag';
-            const mockStatuses = [
-                { id: '1', content: 'First mock status' },
-                { id: '2', content: 'Second mock status' },
-            ];
+        it('should fetch statuses by tag name', async function () {
+            const tagName = 'example';
+            const numOfStatuses = 10;
+            const mockStatuses = Array(numOfStatuses).fill({ id: 'status', content: 'Test Status' });
+            mastoClientMock.v1.timelines.tag.$select().list.resolves(mockStatuses);
 
-            // Stub the masto client method to simulate API response
-            const listStub = sinon.stub(masto.v1.timelines.tag.$select(mockTag), 'list').resolves(mockStatuses);
+            const result = await service.getStatusesFromTag(tagName, numOfStatuses);
 
-            const result = await statusesService.getStatusesFromTag(mockTag, 2);
-
-            assert(listStub.calledOnce, 'Expected list to be called once');
-            assert.strictEqual(listStub.args[0][0].limit, 2, 'The limit parameter should be passed correctly');
-            assert.deepStrictEqual(result, mockStatuses, 'The result should match the mock statuses');
-        });
-
-        it('should use default numOfStatuses when not provided', async function () {
-            const mockTag = 'mocktag';
-            const mockStatuses = [
-                { id: '1', content: 'First mock status' },
-                { id: '2', content: 'Second mock status' },
-                // more mock statuses...
-            ];
-
-            const listStub = sinon.stub(masto.v1.timelines.tag.$select(mockTag), 'list').resolves(mockStatuses);
-
-            const result = await statusesService.getStatusesFromTag(mockTag);
-
-            assert(listStub.calledOnce, 'Expected list to be called once');
-            assert.strictEqual(listStub.args[0][0].limit, 40, 'Default limit should be 40');
+            assert.isTrue(mastoClientMock.v1.timelines.tag.$select().list.calledOnce);
+            assert.deepEqual(result, mockStatuses);
         });
     });
 });

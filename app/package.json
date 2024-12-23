@@ -24,6 +24,7 @@
   "devDependencies": {
     "chai": "^5.1.2",
     "nyc": "^17.1.0",
-    "sinon": "^19.0.2"
+    "sinon": "^19.0.2",
+    "supertest": "^7.0.0"
   }
 }
