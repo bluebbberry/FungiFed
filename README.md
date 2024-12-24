@@ -2,6 +2,8 @@
 
 Starter pack for growing your own fungi on the fediverse!
 
+For background-information about the project's mission statement, see the [Wiki](https://github.com/bluebbberry/FediFungiHost/wiki).
+
 ## The idea behind FediFungi: Benevolent, Decentralized, Evolving Bots on the Fediverse
 
 FediFungi is an experimental framework for creating and managing distributed bots, called "Fungi," that operate and evolve on the Fediverse. Inspired by the principles of federated learning, open-source development, and decentralized social networks, FediFungi introduces a novel way of deploying systems that adapt, migrate, and grow based on community interaction and feedback.
