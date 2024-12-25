@@ -1,7 +1,6 @@
 import * as cron from "node-cron";
 import {cronToHumanReadable} from "./post.util.service.js";
 import {MycelialFungiHistory} from "../model/MycelialFungiHistory.js";
-import masto from "../configs/mastodonclient.js";
 import * as Config from "../configs/config.js";
 import {decode} from "html-entities";
 import {FungiState} from "../model/FungiState.js";

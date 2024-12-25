@@ -1,9 +1,18 @@
-import {createRestAPIClient} from "masto";
+import { createRestAPIClient } from "masto";
 import * as Config from "./config.js";
 
-const masto = createRestAPIClient({
-    url: Config.URL,
-    accessToken: Config.MASTODON_API_KEY,
-});
+let mastoInstance = null; // Singleton instance
 
-export default masto;
+// Function to get or create the Mastodon client
+const getMasto = () => {
+    if (!mastoInstance) {
+        mastoInstance = createRestAPIClient({
+            url: Config.URL,
+            accessToken: Config.MASTODON_API_KEY,
+        });
+    }
+    return mastoInstance;
+};
+
+// Default export: The singleton instance
+export { getMasto };
