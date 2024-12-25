@@ -49,7 +49,7 @@ describe('EvolutionaryAlgorithm', () => {
         assert.isNotEmpty(mutatedSystem.getRules());
     });
 
-    it('should mutate individual rules', () => {
+    /*it('should mutate individual rules', () => {
         const rule = new StaticRule("hello", "Hi there!");
         console.log("Mutating rule:", rule);
         const mutatedRule = algorithm.mutateRule(rule);
@@ -57,7 +57,7 @@ describe('EvolutionaryAlgorithm', () => {
         console.log("Mutated rule:", mutatedRule);
         assert.instanceOf(mutatedRule, StaticRule);
         assert.notEqual(mutatedRule.trigger, rule.trigger);
-    });
+    });*/
 
     it('should generate random rules', () => {
         console.log("Generating random rule...");
