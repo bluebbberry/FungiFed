@@ -1,6 +1,6 @@
-# SemanticBridgeFed
+# FediFungi - Host
 
-An agent for accessing the semantic web through the social web, acting as a bridge between the two!
+Starter pack for growing your own fungi on the fediverse!
 
 For background-information about the project's mission statement, see the [Wiki](https://github.com/bluebbberry/FediFungiHost/wiki).
 
