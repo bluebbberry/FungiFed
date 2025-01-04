@@ -1,10 +1,10 @@
-# FediFungi - Host
+# FungiNode
 
 Starter pack for growing your own fungi on the fediverse!
 
 For background-information about the project's mission statement, see the [Wiki](https://github.com/bluebbberry/FediFungiHost/wiki).
 
-![fungalsemanticwebagent_illustration.jpg](fungalsemanticwebagent_illustration.jpg)
+![https://cdn.shopify.com/s/files/1/0003/0041/7038/files/Lifecycle_Green_V3.png?v=1616186198](https://cdn.shopify.com/s/files/1/0003/0041/7038/files/Lifecycle_Green_V3.png?v=1616186198)
 
 ## The idea behind FediFungi: Benevolent, Decentralized, Evolving Bots on the Fediverse
 
